@@ -2,10 +2,14 @@
 
 Ejecutar con:
     python manage.py test tests.test_w01_entorno --verbosity=2
-"""
 
+Resultado esperado:
+    Ran 8 tests in X.XXXs
+    OK
+"""
 import sys
 from django.test import TestCase
+from django.urls import reverse, NoReverseMatch
 
 
 class PythonVersionTest(TestCase):
@@ -26,14 +30,9 @@ class DjangoVersionTest(TestCase):
     def test_django_version_4_2(self):
         """Django debe ser exactamente la versión 4.2.x."""
         import django
-
         major, minor = django.VERSION[0], django.VERSION[1]
-
         self.assertEqual(major, 4, "Django major debe ser 4")
-        self.assertEqual(
-            minor, 2,
-            "Django minor debe ser 2 (LTS)"
-        )
+        self.assertEqual(minor, 2, "Django minor debe ser 2 (LTS)")
 
 
 class VistasBienvenidaTest(TestCase):
@@ -42,20 +41,16 @@ class VistasBienvenidaTest(TestCase):
     def test_inicio_http_200(self):
         """La página de inicio debe devolver HTTP 200."""
         response = self.client.get('/')
-
         self.assertEqual(
-            response.status_code,
-            200,
+            response.status_code, 200,
             "La vista de inicio no devolvió HTTP 200"
         )
 
     def test_admin_login_accesible(self):
         """El panel de admin debe ser accesible sin autenticación."""
         response = self.client.get('/admin/login/')
-
         self.assertEqual(
-            response.status_code,
-            200,
+            response.status_code, 200,
             "El admin no está accesible — verificar urls.py"
         )
 
@@ -81,35 +76,23 @@ class ConfiguracionDjangoTest(TestCase):
     def test_installed_apps_contiene_erp_apps(self):
         """Las 5 apps del ERP deben estar en INSTALLED_APPS."""
         from django.conf import settings
-
         apps_requeridas = [
-            'clientes',
-            'proveedores',
-            'productos',
-            'ventas',
-            'reportes'
+            'clientes', 'proveedores', 'productos', 'ventas', 'reportes'
         ]
-
         for app in apps_requeridas:
             self.assertIn(
-                app,
-                settings.INSTALLED_APPS,
+                app, settings.INSTALLED_APPS,
                 f"La app '{app}' no está en INSTALLED_APPS"
             )
 
     def test_language_code_es_mx(self):
         """El idioma debe configurarse en español mexicano."""
         from django.conf import settings
-
-        self.assertEqual(
-            settings.LANGUAGE_CODE,
-            'es-mx'
-        )
+        self.assertEqual(settings.LANGUAGE_CODE, 'es-mx')
 
     def test_media_root_configurado(self):
         """MEDIA_ROOT debe estar configurado."""
         from django.conf import settings
-
         self.assertTrue(
             bool(settings.MEDIA_ROOT),
             "MEDIA_ROOT no está configurado en settings.py"
