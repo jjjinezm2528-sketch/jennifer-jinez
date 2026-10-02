@@ -1,20 +1,15 @@
 # clientes/urls.py
-"""URLs de la app clientes — W01 (mínimo funcional)."""
+"""URLs de la app clientes — W02."""
 from django.urls import path
-from django.http import HttpResponse
+from . import views
 
 app_name = 'clientes'
 
-
-def bienvenida_clientes(request):
-    """Vista temporal de bienvenida para la app clientes."""
-    return HttpResponse(
-        "<h2>📦 Módulo Clientes</h2>"
-        "<p>En construcción — Espiral 2 (W04)</p>",
-        content_type='text/html; charset=utf-8'
-    )
-
-
 urlpatterns = [
-    path('', bienvenida_clientes, name='inicio'),
+    path('', views.index, name='inicio'),
+    # Espiral 2 W05:
+    # path('lista/',          views.ClientesListView.as_view(),   name='lista'),
+    # path('nuevo/',          views.ClientesCreateView.as_view(), name='crear'),
+    # path('<int:pk>/',       views.ClientesDetailView.as_view(), name='detalle'),
+    # path('<int:pk>/editar/',views.ClientesUpdateView.as_view(), name='editar'),
 ]
