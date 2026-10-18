@@ -201,7 +201,7 @@ STORAGES = {
         ),
     },
 }
-
+WHITENOISE_MANIFEST_STRICT = False
 
 # =========================================================
 # ARCHIVOS MULTIMEDIA
