@@ -1,26 +1,20 @@
 
-"""
-Configuración principal del proyecto ERP Django.
-"""
+# core/settings.py
 
 from pathlib import Path
 import environ
 
-# =========================================================
-# RUTAS DEL PROYECTO
-# =========================================================
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # =========================================================
-# VARIABLES DE ENTORNO
+# VARIABLES DE ENTORNO LOCALES
 # =========================================================
 
 env = environ.Env()
 env.read_env(BASE_DIR / ".env")
 
 # =========================================================
-# SEGURIDAD Y DEPURACIÓN
+# SEGURIDAD Y DESARROLLO
 # =========================================================
 
 SECRET_KEY = env(
@@ -28,12 +22,11 @@ SECRET_KEY = env(
     default="clave-temporal-solo-para-desarrollo"
 ).strip()
 
-DEBUG = (
-    env("DEBUG", default="False").strip().lower()
-    in ("1", "true", "yes", "on")
-)
+DEBUG = env(
+    "DEBUG",
+    default="False"
+).strip().lower() in ("1", "true", "yes", "on")
 
-# Quita espacios sobrantes de cada dirección.
 _hosts = env(
     "ALLOWED_HOSTS",
     default="localhost,127.0.0.1"
@@ -56,11 +49,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "rest_framework",
     "whitenoise.runserver_nostatic",
-
-    # Aplicaciones del ERP
     "clientes",
     "proveedores",
     "productos",
@@ -84,16 +74,15 @@ MIDDLEWARE = [
 ]
 
 # =========================================================
-# URLS Y SERVIDOR
+# URLS Y APLICACIÓN
 # =========================================================
 
 ROOT_URLCONF = "core.urls"
-
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
 # =========================================================
-# PLANTILLAS HTML
+# PLANTILLAS
 # =========================================================
 
 TEMPLATES = [
@@ -113,7 +102,7 @@ TEMPLATES = [
 ]
 
 # =========================================================
-# BASE DE DATOS SQLITE
+# BASE DE DATOS LOCAL
 # =========================================================
 
 DATABASES = {
@@ -159,39 +148,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # =========================================================
 
 LANGUAGE_CODE = "es-mx"
-
 TIME_ZONE = "America/Mexico_City"
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # =========================================================
 # ARCHIVOS ESTÁTICOS
+# STATICFILES_STORAGE se configura en STORAGES
+# dentro de settings_prod.py para producción.
 # =========================================================
-# settings.py — sección de estáticos (verificar, no duplicar)
-STATIC_URL  = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'   # destino de collectstatic
 
-# STATICFILES_DIRS ≠ STATIC_ROOT (error frecuente)
-STATICFILES_DIRS = [BASE_DIR / 'static']  # fuentes adicionales
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
-
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # =========================================================
 # ARCHIVOS MULTIMEDIA
 # =========================================================
 
 MEDIA_URL = "/media/"
-
 MEDIA_ROOT = BASE_DIR / "media"
 
 # =========================================================
-# CONFIGURACIÓN GENERAL
+# CLAVE PRIMARIA POR DEFECTO
 # =========================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

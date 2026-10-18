@@ -1,26 +1,79 @@
-# Entorno virtual (NO se sube — se recrea con requirements.txt)
+
+# ==========================================
+# ENTORNOS VIRTUALES
+# ==========================================
 env_erp/
+env_erp_respaldo/
 venv/
+.venv/
+
+# ==========================================
+# PYTHON
+# ==========================================
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 
-# Base de datos local
-db.sqlite3
-
-# Variables de entorno (NUNCA subir)
+# ==========================================
+# VARIABLES Y SECRETOS
+# ==========================================
 .env
+.env.*
 
-# Archivos estáticos colectados
+# Permitir plantillas de variables sin secretos
+!.env.example
+
+# ==========================================
+# BASE DE DATOS LOCAL
+# ==========================================
+db.sqlite3
+db.sqlite3-journal
+
+# ==========================================
+# ARCHIVOS ESTATICOS GENERADOS
+# ==========================================
 staticfiles/
 
-# Media subida por usuarios
+# ==========================================
+# ARCHIVOS SUBIDOS POR USUARIOS
+# ==========================================
 media/
 
-# VS Code
+# ==========================================
+# EDITORES Y SISTEMA OPERATIVO
+# ==========================================
 .vscode/
-
-# Sistema operativo
+.idea/
 Thumbs.db
 .DS_Store
+
+# ==========================================
+# ARCHIVOS TEMPORALES Y RESPALDOS
+# ==========================================
+*.tmp
+*.bak
+exclude_temp.txt
+
+# Archivos accidentales y temporales
+/.db
+/CACHED
+/[auth]
+/[internal]
+/dir
+/tatus
+/docker
+/docker-compose
+/exporting
+/resolving
+/WorkSpace_ERP/
+
+# Base de datos local
+*.sqlite3
+*.sqlite3-journal
+/[auth]
+/[internal]
+/[auth]
+/[internal]
+/git
+/\[auth]
+/\[internal]
