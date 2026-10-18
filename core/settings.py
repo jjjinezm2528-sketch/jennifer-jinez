@@ -1,31 +1,26 @@
 
-# core/settings.py
+# Configuracion principal del proyecto ERP Django.
 
 from pathlib import Path
 import environ
 
+# Rutas del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# =========================================================
-# VARIABLES DE ENTORNO LOCALES
-# =========================================================
-
+# Variables de entorno
 env = environ.Env()
 env.read_env(BASE_DIR / ".env")
 
-# =========================================================
-# SEGURIDAD Y DESARROLLO
-# =========================================================
-
+# Seguridad y depuracion
 SECRET_KEY = env(
     "SECRET_KEY",
     default="clave-temporal-solo-para-desarrollo"
 ).strip()
 
-DEBUG = env(
-    "DEBUG",
-    default="False"
-).strip().lower() in ("1", "true", "yes", "on")
+DEBUG = (
+    env("DEBUG", default="False").strip().lower()
+    in ("1", "true", "yes", "on")
+)
 
 _hosts = env(
     "ALLOWED_HOSTS",
@@ -38,10 +33,7 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-# =========================================================
-# APLICACIONES
-# =========================================================
-
+# Aplicaciones
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -58,10 +50,7 @@ INSTALLED_APPS = [
     "reportes",
 ]
 
-# =========================================================
-# MIDDLEWARE
-# =========================================================
-
+# Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -73,18 +62,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# =========================================================
-# URLS Y APLICACIÓN
-# =========================================================
-
+# URLs y servidor
 ROOT_URLCONF = "core.urls"
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
-# =========================================================
-# PLANTILLAS
-# =========================================================
-
+# Plantillas HTML
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -101,10 +84,7 @@ TEMPLATES = [
     },
 ]
 
-# =========================================================
-# BASE DE DATOS LOCAL
-# =========================================================
-
+# Base de datos local
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -112,10 +92,7 @@ DATABASES = {
     }
 }
 
-# =========================================================
-# VALIDACIÓN DE CONTRASEÑAS
-# =========================================================
-
+# Validacion de contrasenas
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
@@ -143,42 +120,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# =========================================================
-# IDIOMA Y ZONA HORARIA
-# =========================================================
-
+# Idioma y zona horaria
 LANGUAGE_CODE = "es-mx"
 TIME_ZONE = "America/Mexico_City"
 USE_I18N = True
 USE_TZ = True
 
-# =========================================================
-# ARCHIVOS ESTÁTICOS
-# STATICFILES_STORAGE se configura en STORAGES
-# dentro de settings_prod.py para producción.
-# =========================================================
-
+# Archivos estaticos
+# La configuracion de produccion se encuentra en settings_prod.py.
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# =========================================================
-# ARCHIVOS MULTIMEDIA
-# =========================================================
-
+# Archivos multimedia
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# =========================================================
-# CLAVE PRIMARIA POR DEFECTO
-# =========================================================
-
+# Clave primaria por defecto
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# =========================================================
-# DJANGO REST FRAMEWORK
-# =========================================================
-
+# Django REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
