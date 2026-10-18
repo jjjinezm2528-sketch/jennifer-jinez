@@ -50,31 +50,25 @@ ALLOWED_HOSTS = [
 # IMPORTANTE: JAZZMIN ANTES DE DJANGO ADMIN
 # =========================================================
 
-
 INSTALLED_APPS = [
-    # Tema visual del administrador
-    'jazzmin',
+    "jazzmin",
 
-    # Aplicaciones propias de Django
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    # API REST
-    'rest_framework',
+    "rest_framework",
 
-    # Aplicaciones del ERP
-    'clientes',
-    'proveedores',
-    'productos',
-    'ventas',
-    'reportes',
-    'configuracion',
+    "clientes",
+    "proveedores",
+    "productos",
+    "ventas",
+    "reportes",
+    "configuracion",
 ]
-
 
 
 # =========================================================
@@ -127,6 +121,7 @@ TEMPLATES = [
 
 # =========================================================
 # BASE DE DATOS DE DESARROLLO
+# Producción puede sobrescribirla en settings_prod.py
 # =========================================================
 
 DATABASES = {
@@ -160,6 +155,7 @@ AUTH_PASSWORD_VALIDATORS = [
             "CommonPasswordValidator"
         ),
     },
+
     {
         "NAME": (
             "django.contrib.auth.password_validation."
@@ -184,6 +180,7 @@ USE_TZ = True
 
 # =========================================================
 # ARCHIVOS ESTÁTICOS
+# Compatible con Django 4.2 y WhiteNoise
 # =========================================================
 
 STATIC_URL = "/static/"
@@ -194,9 +191,16 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        ),
+    },
+}
 
 
 # =========================================================
@@ -232,24 +236,20 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # =========================================================
 
 JAZZMIN_SETTINGS = {
-    # Identidad
     "site_title": "ERP Django",
     "site_header": "ERP UTEC Celaya",
     "site_brand": "📦 ERP Django",
     "welcome_sign": "Bienvenido al Sistema ERP · UTEC Celaya",
     "copyright": "MC. Román Fernando López González · UTEC Celaya",
 
-    # Logo e icono
     "site_icon": None,
     "site_logo": None,
 
-    # Búsqueda global
     "search_model": [
         "clientes.Cliente",
         "productos.Producto",
     ],
 
-    # Menú superior
     "topmenu_links": [
         {
             "name": "Inicio ERP",
@@ -270,7 +270,6 @@ JAZZMIN_SETTINGS = {
         },
     ],
 
-    # Menú del usuario
     "usermenu_links": [
         {
             "name": "Ver ERP",
@@ -279,7 +278,6 @@ JAZZMIN_SETTINGS = {
         },
     ],
 
-    # Orden de aplicaciones
     "order_with_respect_to": [
         "clientes",
         "proveedores",
@@ -289,7 +287,6 @@ JAZZMIN_SETTINGS = {
         "auth",
     ],
 
-    # Iconos de los modelos
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -311,7 +308,6 @@ JAZZMIN_SETTINGS = {
     "default_icon_parents": "fas fa-folder",
     "default_icon_children": "fas fa-circle",
 
-    # Apariencia y navegación
     "related_modal_active": True,
     "custom_css": "erp_custom.css",
     "show_sidebar": True,
@@ -319,7 +315,6 @@ JAZZMIN_SETTINGS = {
     "hide_apps": [],
     "hide_models": [],
 
-    # Formularios del administrador
     "changeform_format": "horizontal_tabs",
     "language_chooser": False,
 }
