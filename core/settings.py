@@ -35,20 +35,24 @@ ALLOWED_HOSTS = [
 
 # Aplicaciones
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "rest_framework",
-    "whitenoise.runserver_nostatic",
-    "clientes",
-    "proveedores",
-    "productos",
-    "ventas",
-    "reportes",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Terceros
+    'rest_framework',
+    'whitenoise.runserver_nostatic',
+    # Apps del ERP
+    'clientes',
+    'proveedores',
+    'productos',
+    'ventas',
+    'reportes',
+    'configuracion',   # ← nueva app W05
 ]
+
 
 # Middleware
 MIDDLEWARE = [
