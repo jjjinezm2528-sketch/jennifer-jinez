@@ -13,7 +13,7 @@ class VentaListView(ListView):
     """Lista paginada de ventas en orden cronológico inverso."""
 
     model               = Venta
-    template_name       = 'ventas/lista.html'
+    template_name       = 'ventas/index.html'
     context_object_name = 'ventas'
     paginate_by         = 20
 

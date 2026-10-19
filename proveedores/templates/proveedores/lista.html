@@ -1,55 +1,67 @@
+
 {% extends "base.html" %}
-{% block title %}Proveedores{% endblock %}
+
+{% block title %}Proveedores | ERP Django{% endblock %}
 {% block nav_proveedores %}active{% endblock %}
 
 {% block content %}
+
 <div class="erp-page-title">
-    <h2>🏭 Proveedores</h2>
+    <div>
+        <h1>🏭 Proveedores</h1>
+        <p>Administración de proveedores del ERP.</p>
+    </div>
+
+    <div>
+        <span class="badge-erp-active">
+            {{ proveedores|length }} proveedores
+        </span>
+    </div>
+</div>
+
+<div class="erp-toolbar">
     {% if user.is_authenticated %}
-        <a href="{% url 'proveedores:crear' %}"
-           class="btn-erp-gold ms-auto">+ Nuevo</a>
+        <span class="btn-erp-gold"
+              title="Función pendiente de implementar">
+            + Nuevo proveedor (próximamente)
+        </span>
     {% endif %}
 </div>
 
-{% if proveedores %}
-<table class="erp-table">
-    <thead>
-        <tr>
-            <th>#</th><th>Nombre</th><th>Contacto</th>
-            <th>Correo</th><th>Estado</th>
-            {% if user.is_authenticated %}<th>Acciones</th>{% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for p in proveedores %}
-        <tr>
-            <td><code>{{ p.pk }}</code></td>
-            <td>
-                <a href="{% url 'proveedores:detalle' p.pk %}"
-                   style="color:var(--clr-royal);font-weight:600;">
-                    {{ p.nombre }}
-                </a>
-            </td>
-            <td>{{ p.contacto|default:"—" }}</td>
-            <td>{{ p.correo }}</td>
-            <td>
-                {% if p.activo %}
-                    <span class="badge-erp-active">Activo</span>
-                {% else %}
-                    <span class="badge-erp-inactive">Inactivo</span>
-                {% endif %}
-            </td>
-            {% if user.is_authenticated %}
-            <td>
-                <a href="{% url 'proveedores:editar' p.pk %}"
-                   class="btn-erp-primary btn-erp-sm">Editar</a>
-            </td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<div class="erp-alert-info">No hay proveedores registrados aún.</div>
-{% endif %}
+<div class="table-responsive">
+    <table class="erp-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Proveedor</th>
+                <th>Correo electrónico</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for proveedor in proveedores %}
+                <tr>
+                    <td>{{ proveedor.pk }}</td>
+                    <td>{{ proveedor }}</td>
+                    <td>{{ proveedor.email|default:"—" }}</td>
+                    <td>{{ proveedor.telefono|default:"—" }}</td>
+                    <td>
+                        {% if proveedor.activo %}
+                            <span class="badge-erp-active">Activo</span>
+                        {% else %}
+                            <span class="badge-erp-inactive">Inactivo</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No hay proveedores registrados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}
