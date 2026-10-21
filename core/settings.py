@@ -332,9 +332,9 @@ JAZZMIN_UI_TWEAKS = {
     "body_small_text": False,
     "brand_small_text": False,
 
-    "brand_colour": "navbar-dark",
-    "accent": "accent-navy",
-    "navbar": "navbar-dark",
+    "brand_colour": "navbar-purple",
+    "accent": "accent-purple",
+    "sidebar": "sidebar-dark-purple",
     "no_navbar_border": False,
     "navbar_fixed": True,
 
@@ -351,7 +351,7 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_flat_style": False,
 
     "theme": "default",
-    "dark_mode_theme": None,
+    "dark_mode_theme": "darkly",
 
     "button_classes": {
         "primary": "btn-primary",
