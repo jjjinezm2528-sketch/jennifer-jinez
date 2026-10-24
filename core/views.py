@@ -1,3 +1,4 @@
+
 # core/views.py
 """Vistas principales del proyecto ERP — W02.
 
@@ -20,25 +21,25 @@ def bienvenida(request):
         {
             'nombre': 'Productos',
             'icono': '📦',
-            'url': reverse('productos:inicio'),
+            'url': reverse('productos:lista'),
             'descripcion': 'Inventario, precios y stock',
         },
         {
             'nombre': 'Clientes',
             'icono': '👥',
-            'url': reverse('clientes:inicio'),
+            'url': reverse('clientes:lista'),
             'descripcion': 'Cartera y gestión de clientes',
         },
         {
             'nombre': 'Proveedores',
             'icono': '🏭',
-            'url': reverse('proveedores:inicio'),
+            'url': reverse('proveedores:lista'),
             'descripcion': 'Red de proveedores',
         },
         {
             'nombre': 'Ventas',
             'icono': '💰',
-            'url': reverse('ventas:inicio'),
+            'url': reverse('ventas:lista'),
             'descripcion': 'Pedidos, facturas y cobros',
         },
         {

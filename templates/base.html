@@ -415,22 +415,22 @@
 
     <div class="erp-nav-links">
         <!-- Las rutas usan los nombres definidos en cada urls.py -->
-        <a href="{% url 'productos:inicio' %}"
+        <a href="{% url 'productos:lista' %}"
            class="erp-nav-link {% block nav_productos %}{% endblock %}">
             Productos
         </a>
 
-        <a href="{% url 'clientes:inicio' %}"
+        <a href="{% url 'clientes:lista' %}"
            class="erp-nav-link {% block nav_clientes %}{% endblock %}">
             Clientes
         </a>
 
-        <a href="{% url 'proveedores:inicio' %}"
+        <a href="{% url 'proveedores:lista' %}"
            class="erp-nav-link {% block nav_proveedores %}{% endblock %}">
             Proveedores
         </a>
 
-        <a href="{% url 'ventas:inicio' %}"
+        <a href="{% url 'ventas:lista' %}"
            class="erp-nav-link {% block nav_ventas %}{% endblock %}">
             Ventas
         </a>
@@ -521,4 +521,3 @@
 
 </body>
 </html>
-```
