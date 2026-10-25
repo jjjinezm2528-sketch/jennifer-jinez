@@ -1,10 +1,16 @@
 
 # ventas/views.py
-"""Vistas de la app ventas — W07 y W08."""
+"""Vistas de la app ventas — W07, W08 y W09."""
 
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import (
+    login_required,
+    permission_required,
+)
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+)
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -15,7 +21,7 @@ from django.views.generic import (
 )
 
 from .forms import DetalleVentaForm, VentaForm
-from .models import DetalleVenta, Venta
+from .models import Venta
 
 
 class VentaListView(ListView):
@@ -52,17 +58,14 @@ class VentaDetailView(DetailView):
         )
 
 
+@login_required
+@permission_required('ventas.add_venta', raise_exception=True)
 def crear_venta(request):
-    """Crea una venta con una línea de detalle.
+    """Crea un encabezado de venta con una línea de detalle.
 
     GET: muestra los dos formularios.
-    POST: valida y guarda ambos dentro de una transacción.
+    POST: valida ambos y guarda si son correctos.
     """
-
-    if not request.user.is_authenticated:
-        return redirect(
-            f"{settings.LOGIN_URL}?next={request.path}"
-        )
 
     venta_form = VentaForm(request.POST or None)
     detalle_form = DetalleVentaForm(request.POST or None)
@@ -95,13 +98,20 @@ def crear_venta(request):
     )
 
 
-class VentaDeleteView(LoginRequiredMixin, DeleteView):
-    """Confirma y elimina una venta."""
+class VentaDeleteView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    DeleteView,
+):
+    """Confirma y elimina una venta con permiso autorizado."""
 
     model = Venta
     template_name = 'ventas/eliminar.html'
     pk_url_kwarg = 'venta_id'
     success_url = reverse_lazy('ventas:lista')
+
+    permission_required = 'ventas.delete_venta'
+    raise_exception = True
 
     def form_valid(self, form):
         pk = self.object.pk

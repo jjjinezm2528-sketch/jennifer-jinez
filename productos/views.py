@@ -1,9 +1,13 @@
 
 # productos/views.py
-"""Vistas de la app productos — W07 y W08."""
+"""Vistas de la app productos — W07, W08 y W09."""
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+)
+from django.contrib.auth.views import redirect_to_login
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -86,13 +90,31 @@ class ProductoUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class ProductoDeleteView(LoginRequiredMixin, DeleteView):
-    """Confirma y elimina un producto."""
+class ProductoDeleteView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    DeleteView,
+):
+    """Confirma y elimina un producto con permiso autorizado."""
 
     model = Producto
     template_name = 'productos/eliminar.html'
     pk_url_kwarg = 'producto_id'
     success_url = reverse_lazy('productos:lista')
+
+    permission_required = 'productos.delete_producto'
+    raise_exception = True
+
+    def handle_no_permission(self):
+        """Redirige usuarios anónimos y deniega usuarios sin permiso."""
+        if not self.request.user.is_authenticated:
+            return redirect_to_login(
+                self.request.get_full_path(),
+                self.get_login_url(),
+                self.get_redirect_field_name(),
+            )
+
+        return super().handle_no_permission()
 
     def form_valid(self, form):
         nombre = self.object.nombre

@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 from django.urls import reverse
 
@@ -12,10 +12,16 @@ from ventas.models import Venta
 
 class ProductoEscrituraTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user('testuser', password='testpass123')
+        self.user = User.objects.create_user(
+            'testuser',
+            password='testpass123',
+        )
         self.cat = Categoria.objects.create(nombre='Cat Test')
         self.prod = Producto.objects.create(
-            nombre='Laptop', precio=Decimal('10000.00'), stock=5, categoria=self.cat,
+            nombre='Laptop',
+            precio=Decimal('10000.00'),
+            stock=5,
+            categoria=self.cat,
         )
 
     def test_crear_sin_auth_redirige_a_login(self):
@@ -24,7 +30,9 @@ class ProductoEscrituraTest(TestCase):
         self.assertIn('/accounts/login/', r['Location'])
 
     def test_editar_sin_auth_redirige_a_login(self):
-        r = self.client.get(reverse('productos:editar', args=[self.prod.pk]))
+        r = self.client.get(
+            reverse('productos:editar', args=[self.prod.pk])
+        )
         self.assertEqual(r.status_code, 302)
         self.assertIn('/accounts/login/', r['Location'])
 
@@ -37,36 +45,61 @@ class ProductoEscrituraTest(TestCase):
     def test_post_valido_crea_producto(self):
         self.client.force_login(self.user)
         datos = {
-            'nombre': 'Monitor 4K', 'precio': '5500.00', 'stock': '3',
-            'categoria': self.cat.pk, 'activo': True,
+            'nombre': 'Monitor 4K',
+            'precio': '5500.00',
+            'stock': '3',
+            'categoria': self.cat.pk,
+            'activo': True,
         }
         r = self.client.post(reverse('productos:crear'), datos)
         self.assertRedirects(r, reverse('productos:lista'))
-        self.assertTrue(Producto.objects.filter(nombre='Monitor 4K').exists())
+        self.assertTrue(
+            Producto.objects.filter(nombre='Monitor 4K').exists()
+        )
 
     def test_post_invalido_muestra_errores(self):
         self.client.force_login(self.user)
         datos = {
-            'nombre': 'Producto mal', 'precio': '-100.00', 'stock': '5',
+            'nombre': 'Producto mal',
+            'precio': '-100.00',
+            'stock': '5',
             'categoria': self.cat.pk,
         }
         r = self.client.post(reverse('productos:crear'), datos)
         self.assertEqual(r.status_code, 200)
         self.assertIn('precio', r.context['form'].errors)
         errores = r.context['form'].errors['precio']
-        self.assertTrue(any('negativo' in e.lower() for e in errores), f'Errores: {errores}')
+        self.assertTrue(
+            any('negativo' in e.lower() for e in errores),
+            f'Errores: {errores}',
+        )
 
     def test_delete_elimina_producto(self):
         self.client.force_login(self.user)
+
+        permiso = Permission.objects.get(
+            content_type__app_label='productos',
+            codename='delete_producto',
+        )
+        self.user.user_permissions.add(permiso)
+
         pk = self.prod.pk
-        r = self.client.post(reverse('productos:eliminar', args=[pk]))
+        r = self.client.post(
+            reverse('productos:eliminar', args=[pk])
+        )
+
         self.assertRedirects(r, reverse('productos:lista'))
-        self.assertFalse(Producto.objects.filter(pk=pk).exists())
+        self.assertFalse(
+            Producto.objects.filter(pk=pk).exists()
+        )
 
 
 class ClienteEscrituraTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user('userC', password='pass')
+        self.user = User.objects.create_user(
+            'userC',
+            password='pass',
+        )
 
     def test_crear_cliente_sin_auth_redirige(self):
         r = self.client.get(reverse('clientes:crear'))
@@ -76,29 +109,53 @@ class ClienteEscrituraTest(TestCase):
         self.client.force_login(self.user)
         r = self.client.post(
             reverse('clientes:crear'),
-            {'nombre': 'María López', 'correo': 'maria@test.com', 'activo': True},
+            {
+                'nombre': 'María López',
+                'correo': 'maria@test.com',
+                'activo': True,
+            },
         )
         self.assertRedirects(r, reverse('clientes:lista'))
-        self.assertTrue(Cliente.objects.filter(correo='maria@test.com').exists())
+        self.assertTrue(
+            Cliente.objects.filter(
+                correo='maria@test.com'
+            ).exists()
+        )
 
     def test_post_correo_duplicado_muestra_error(self):
-        Cliente.objects.create(nombre='Ana', correo='dup@test.com')
+        Cliente.objects.create(
+            nombre='Ana',
+            correo='dup@test.com',
+        )
         self.client.force_login(self.user)
         r = self.client.post(
             reverse('clientes:crear'),
-            {'nombre': 'Otro', 'correo': 'dup@test.com', 'activo': True},
+            {
+                'nombre': 'Otro',
+                'correo': 'dup@test.com',
+                'activo': True,
+            },
         )
         self.assertEqual(r.status_code, 200)
         self.assertIn('correo', r.context['form'].errors)
         self.assertFalse(
-            Cliente.objects.filter(nombre='Otro', correo='dup@test.com').exists()
+            Cliente.objects.filter(
+                nombre='Otro',
+                correo='dup@test.com',
+            ).exists()
         )
 
 
 class ProveedorEscrituraTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user('userP', password='pass')
-        self.prov = Proveedor.objects.create(nombre='Prov Test', correo='prov@test.com')
+        self.user = User.objects.create_user(
+            'userP',
+            password='pass',
+        )
+        self.prov = Proveedor.objects.create(
+            nombre='Prov Test',
+            correo='prov@test.com',
+        )
 
     def test_crear_proveedor_sin_auth_redirige(self):
         r = self.client.get(reverse('proveedores:crear'))
@@ -107,19 +164,32 @@ class ProveedorEscrituraTest(TestCase):
     def test_delete_proveedor_con_auth(self):
         self.client.force_login(self.user)
         pk = self.prov.pk
-        r = self.client.post(reverse('proveedores:eliminar', args=[pk]))
+        r = self.client.post(
+            reverse('proveedores:eliminar', args=[pk])
+        )
         self.assertRedirects(r, reverse('proveedores:lista'))
-        self.assertFalse(Proveedor.objects.filter(pk=pk).exists())
+        self.assertFalse(
+            Proveedor.objects.filter(pk=pk).exists()
+        )
 
 
 class VentaEscrituraTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user('userV', password='pass')
+        self.user = User.objects.create_user(
+            'userV',
+            password='pass',
+        )
         cat = Categoria.objects.create(nombre='Cat')
         self.prod = Producto.objects.create(
-            nombre='P', precio=Decimal('100.00'), stock=5, categoria=cat,
+            nombre='P',
+            precio=Decimal('100.00'),
+            stock=5,
+            categoria=cat,
         )
-        self.cli = Cliente.objects.create(nombre='C', correo='c@t.com')
+        self.cli = Cliente.objects.create(
+            nombre='C',
+            correo='c@t.com',
+        )
 
     def test_crear_venta_sin_auth_redirige(self):
         r = self.client.get(reverse('ventas:crear'))
@@ -127,13 +197,26 @@ class VentaEscrituraTest(TestCase):
 
     def test_post_valido_crea_venta(self):
         self.client.force_login(self.user)
+
+        permiso = Permission.objects.get(
+            content_type__app_label='ventas',
+            codename='add_venta',
+        )
+        self.user.user_permissions.add(permiso)
+
         r = self.client.post(
             reverse('ventas:crear'),
             {
-                'cliente': self.cli.pk, 'producto': self.prod.pk,
-                'cantidad': 2, 'precio_unitario': '100.00',
+                'cliente': self.cli.pk,
+                'producto': self.prod.pk,
+                'cantidad': 2,
+                'precio_unitario': '100.00',
             },
         )
+
         self.assertEqual(r.status_code, 302)
         self.assertEqual(Venta.objects.count(), 1)
-        self.assertEqual(Venta.objects.first().total, Decimal('200.00'))
+        self.assertEqual(
+            Venta.objects.first().total,
+            Decimal('200.00'),
+        )

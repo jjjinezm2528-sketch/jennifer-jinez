@@ -53,15 +53,25 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     "jazzmin",
 
+    # Aplicaciones de Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 
+    # Autenticación con django-allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+
+    # Terceros
     "rest_framework",
 
+    # Aplicaciones del ERP
+    "core",
     "clientes",
     "proveedores",
     "productos",
@@ -84,8 +94,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
-
 
 # =========================================================
 # URLS Y APLICACIÓN WSGI
@@ -155,7 +165,6 @@ AUTH_PASSWORD_VALIDATORS = [
             "CommonPasswordValidator"
         ),
     },
-
     {
         "NAME": (
             "django.contrib.auth.password_validation."
@@ -164,6 +173,37 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# =========================================================
+# AUTENTICACIÓN CON DJANGO-ALLAUTH
+# =========================================================
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/productos/"
+LOGOUT_REDIRECT_URL = "/"
+
+
+# =========================================================
+# CONFIGURACIÓN DE CUENTAS ALLAUTH
+# =========================================================
+
+# El inicio de sesión por correo depende de la versión
+# instalada de django-allauth. Se conserva el acceso por
+# nombre de usuario como opción compatible.
+ACCOUNT_AUTHENTICATION_METHOD = "username"
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
 
 # =========================================================
 # IDIOMA Y ZONA HORARIA
@@ -191,7 +231,6 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -204,6 +243,7 @@ STORAGES = {
 }
 
 WHITENOISE_MANIFEST_STRICT = False
+
 
 # =========================================================
 # ARCHIVOS MULTIMEDIA
@@ -323,7 +363,7 @@ JAZZMIN_SETTINGS = {
 
 
 # =========================================================
-# JAZZMIN — ESTILO VISUAL AZULERP
+# JAZZMIN — ESTILO VISUAL
 # =========================================================
 
 JAZZMIN_UI_TWEAKS = {
@@ -334,14 +374,13 @@ JAZZMIN_UI_TWEAKS = {
 
     "brand_colour": "navbar-purple",
     "accent": "accent-purple",
-    "sidebar": "sidebar-dark-purple",
     "no_navbar_border": False,
     "navbar_fixed": True,
 
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-navy",
+    "sidebar": "sidebar-dark-purple",
 
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -351,7 +390,9 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_flat_style": False,
 
     "theme": "default",
-    "dark_mode_theme": "darkly",
+
+    # Configuración moderna de modo claro/oscuro
+    "default_theme_mode": "auto",
 
     "button_classes": {
         "primary": "btn-primary",
@@ -362,6 +403,3 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success",
     },
 }
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
