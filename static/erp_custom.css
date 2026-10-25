@@ -365,3 +365,47 @@ a {
         transform: none !important;
     }
 }
+
+/* =========================================================
+   14. IMAGEN DE FONDO EN TODA LA PÁGINA
+   ========================================================= */
+
+html {
+    min-height: 100%;
+    background: #160d24;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+
+    background-image: url("/static/images/fantasmas.png") !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+/* Hacer transparentes los contenedores que tapan la imagen */
+.wrapper,
+.content-wrapper,
+.content,
+.content-header,
+.container-fluid,
+.main-footer {
+    background-color: transparent !important;
+}
+
+/* Mantener el menú lateral morado */
+.main-sidebar,
+.main-sidebar .sidebar,
+.main-header.navbar {
+    background-color: var(--erp-purple) !important;
+}
+
+/* Conservar el fondo de las tarjetas para facilitar la lectura */
+.card,
+.small-box,
+.info-box {
+    background-color: rgba(255, 255, 255, 0.90);
+}

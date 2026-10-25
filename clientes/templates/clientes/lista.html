@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Clientes | ERP Django{% endblock %}
@@ -20,10 +19,9 @@
 
 <div class="erp-toolbar">
     {% if user.is_authenticated %}
-        <span class="btn-erp-gold"
-              title="Función pendiente de implementar">
-            + Nuevo cliente (próximamente)
-        </span>
+        <a href="{% url 'clientes:crear' %}" class="btn-erp-gold">
+            + Nuevo cliente
+        </a>
     {% endif %}
 </div>
 
@@ -50,23 +48,15 @@
                         </a>
                     </td>
 
-                    <td>
-                        {{ cliente.email|default:"—" }}
-                    </td>
+                    <td>{{ cliente.email|default:"—" }}</td>
 
-                    <td>
-                        {{ cliente.telefono|default:"—" }}
-                    </td>
+                    <td>{{ cliente.telefono|default:"—" }}</td>
 
                     <td>
                         {% if cliente.activo %}
-                            <span class="badge-erp-active">
-                                Activo
-                            </span>
+                            <span class="badge-erp-active">Activo</span>
                         {% else %}
-                            <span class="badge-erp-inactive">
-                                Inactivo
-                            </span>
+                            <span class="badge-erp-inactive">Inactivo</span>
                         {% endif %}
                     </td>
                 </tr>
