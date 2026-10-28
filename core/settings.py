@@ -69,6 +69,8 @@ INSTALLED_APPS = [
 
     # Terceros
     "rest_framework",
+    "rest_framework.authtoken",
+    "whitenoise.runserver_nostatic",
 
     # Aplicaciones del ERP
     "core",
@@ -96,6 +98,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
+
 
 # =========================================================
 # URLS Y APLICACIÓN WSGI
@@ -194,9 +197,7 @@ LOGOUT_REDIRECT_URL = "/"
 # CONFIGURACIÓN DE CUENTAS ALLAUTH
 # =========================================================
 
-# El inicio de sesión por correo depende de la versión
-# instalada de django-allauth. Se conserva el acceso por
-# nombre de usuario como opción compatible.
+# Se conserva la configuración original de cuentas.
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = True
@@ -204,6 +205,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_SESSION_REMEMBER = True
+
 
 # =========================================================
 # IDIOMA Y ZONA HORARIA
@@ -256,12 +258,28 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # =========================================================
 # DJANGO REST FRAMEWORK
+# W10 — APARTADOS 1.1 Y 1.2
 # =========================================================
 
 REST_FRAMEWORK = {
+    # Autenticación por sesión y por token
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+
+    # Lectura pública y escritura para usuarios autenticados
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
+
+    # Paginación por número de página
+    "DEFAULT_PAGINATION_CLASS": (
+        "rest_framework.pagination.PageNumberPagination"
+    ),
+
+    # Resultados por página
+    "PAGE_SIZE": 20,
 }
 
 
