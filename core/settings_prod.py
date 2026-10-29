@@ -1,13 +1,15 @@
 
 """
-Configuracion de produccion para Render.
-Hereda la configuracion principal de core/settings.py.
+Configuración de producción para Render.
+Hereda la configuración principal de core/settings.py.
 """
 
 import os
+
 import dj_database_url
 
 from .settings import *
+
 
 # =========================================================
 # SEGURIDAD
@@ -21,6 +23,7 @@ if not SECRET_KEY:
     raise RuntimeError(
         "Falta SECRET_KEY en las variables de entorno de Render."
     )
+
 
 # =========================================================
 # HOSTS PERMITIDOS
@@ -46,6 +49,7 @@ if not ALLOWED_HOSTS:
         "Configura ALLOWED_HOSTS o verifica RENDER_EXTERNAL_HOSTNAME."
     )
 
+
 # =========================================================
 # BASE DE DATOS POSTGRESQL
 # =========================================================
@@ -66,13 +70,17 @@ DATABASES = {
     )
 }
 
+
 # =========================================================
-# ARCHIVOS ESTATICOS Y WHITENOISE
+# ARCHIVOS ESTÁTICOS Y ALMACENAMIENTO
 # =========================================================
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Configuración predeterminada:
+# archivos multimedia en el sistema de archivos local.
+# En producción, S3 se activa si existe AWS_STORAGE_BUCKET_NAME.
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -83,6 +91,7 @@ STORAGES = {
         ),
     },
 }
+
 
 # =========================================================
 # SEGURIDAD HTTPS
@@ -97,8 +106,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
 
+
 # =========================================================
-# ORIGENES DE CONFIANZA PARA CSRF
+# ORÍGENES DE CONFIANZA PARA CSRF
 # =========================================================
 
 CSRF_TRUSTED_ORIGINS = [
@@ -106,6 +116,7 @@ CSRF_TRUSTED_ORIGINS = [
     for host in ALLOWED_HOSTS
     if host not in ("localhost", "127.0.0.1")
 ]
+
 
 # =========================================================
 # REGISTRO DE ERRORES
@@ -125,9 +136,60 @@ LOGGING = {
     },
 }
 
+
 # =========================================================
-# ARCHIVOS MULTIMEDIA
+# ARCHIVOS MULTIMEDIA — W11
 # =========================================================
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# S3 es opcional. Si no hay nombre de bucket configurado,
+# Django conserva el almacenamiento local predeterminado.
+
+_bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME", "").strip()
+
+if _bucket:
+    # Credenciales y configuración del bucket S3.
+    AWS_ACCESS_KEY_ID = os.environ.get(
+        "AWS_ACCESS_KEY_ID", ""
+    )
+    AWS_SECRET_ACCESS_KEY = os.environ.get(
+        "AWS_SECRET_ACCESS_KEY", ""
+    )
+    AWS_STORAGE_BUCKET_NAME = _bucket
+
+    AWS_S3_REGION_NAME = os.environ.get(
+        "AWS_S3_REGION_NAME", "us-east-1"
+    )
+
+    AWS_DEFAULT_ACL = None
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+
+    # Dominio CDN opcional.
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get(
+        "AWS_S3_CUSTOM_DOMAIN", ""
+    ).strip()
+
+    # Django 4.2 utiliza STORAGES para definir el backend activo.
+    STORAGES = {
+        "default": {
+            "BACKEND": (
+                "storages.backends.s3boto3.S3Boto3Storage"
+            ),
+        },
+        "staticfiles": {
+            "BACKEND": (
+                "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            ),
+        },
+    }
+
+    # URL pública de las imágenes.
+    if AWS_S3_CUSTOM_DOMAIN:
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    else:
+        MEDIA_URL = (
+            f"https://{_bucket}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+        )
