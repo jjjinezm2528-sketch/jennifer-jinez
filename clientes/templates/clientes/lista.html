@@ -18,7 +18,7 @@
 </div>
 
 <div class="erp-toolbar">
-    {% if user.is_authenticated %}
+    {% if perms.clientes.add_cliente %}
         <a href="{% url 'clientes:crear' %}" class="btn-erp-gold">
             + Nuevo cliente
         </a>
@@ -34,6 +34,7 @@
                 <th>Correo electrónico</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
+                <th>Acciones</th>
             </tr>
         </thead>
 
@@ -59,10 +60,26 @@
                             <span class="badge-erp-inactive">Inactivo</span>
                         {% endif %}
                     </td>
+
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'clientes:detalle' cliente.pk %}"
+                               class="btn-erp-primary">
+                                Ver
+                            </a>
+
+                            {% if perms.clientes.delete_cliente %}
+                                <a href="{% url 'clientes:eliminar' cliente.pk %}"
+                                   class="btn-erp-danger">
+                                    🗑️ Eliminar
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         No hay clientes registrados.
                     </td>
                 </tr>

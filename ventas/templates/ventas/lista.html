@@ -19,7 +19,7 @@
 </div>
 
 <div class="erp-toolbar">
-    {% if user.is_authenticated %}
+    {% if perms.ventas.add_venta %}
         <a href="{% url 'ventas:crear' %}"
            class="btn-erp-gold">
             + Nueva venta
@@ -36,6 +36,7 @@
                 <th>Cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
+                <th>Acciones</th>
             </tr>
         </thead>
 
@@ -46,11 +47,38 @@
                     <td>{{ venta }}</td>
                     <td>{{ venta.cliente|default:"—" }}</td>
                     <td>{{ venta.fecha|default:"—" }}</td>
-                    <td>{{ venta.total|default:"—" }}</td>
+                    <td>${{ venta.total|floatformat:2 }}</td>
+
+                    <td>
+                        <div class="d-flex gap-2">
+
+                            <a href="{% url 'ventas:detalle' venta.pk %}"
+                               class="btn-erp-primary"
+                               style="text-decoration:none; white-space:nowrap;">
+                                Ver
+                            </a>
+
+                            <a href="{% url 'ventas:ticket' venta.pk %}"
+                               class="btn-erp-gold"
+                               style="text-decoration:none; white-space:nowrap;">
+                                🎟️ Imprimir ticket
+                            </a>
+
+                            {% if perms.ventas.delete_venta %}
+                                <a href="{% url 'ventas:eliminar' venta.pk %}"
+                                   class="btn-erp-danger"
+                                   style="text-decoration:none; white-space:nowrap;">
+                                    🗑️ Eliminar
+                                </a>
+                            {% endif %}
+
+                        </div>
+                    </td>
                 </tr>
+
             {% empty %}
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         No hay ventas registradas.
                     </td>
                 </tr>

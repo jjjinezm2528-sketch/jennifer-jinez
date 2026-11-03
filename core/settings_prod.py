@@ -61,12 +61,20 @@ if not DATABASE_URL:
         "Falta DATABASE_URL. Configura PostgreSQL en Render."
     )
 
+# SSL activado por defecto en producción.
+# Para Docker local se puede desactivar mediante:
+# DATABASE_SSL_REQUIRE=False
+
+DATABASE_SSL_REQUIRE = (
+    os.environ.get("DATABASE_SSL_REQUIRE", "true").lower() == "true"
+)
+
 DATABASES = {
     "default": dj_database_url.parse(
         DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
-        ssl_require=True,
+        ssl_require=DATABASE_SSL_REQUIRE,
     )
 }
 
@@ -81,6 +89,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Configuración predeterminada:
 # archivos multimedia en el sistema de archivos local.
 # En producción, S3 se activa si existe AWS_STORAGE_BUCKET_NAME.
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -98,9 +107,22 @@ STORAGES = {
 # =========================================================
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
+# HTTPS activado por defecto para Render.
+# En Docker local se puede desactivar mediante:
+# SECURE_SSL_REDIRECT=False
+
+SECURE_SSL_REDIRECT = (
+    os.environ.get("SECURE_SSL_REDIRECT", "true").lower() == "true"
+)
+
+SESSION_COOKIE_SECURE = (
+    os.environ.get("SESSION_COOKIE_SECURE", "true").lower() == "true"
+)
+
+CSRF_COOKIE_SECURE = (
+    os.environ.get("CSRF_COOKIE_SECURE", "true").lower() == "true"
+)
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
@@ -151,12 +173,15 @@ _bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME", "").strip()
 
 if _bucket:
     # Credenciales y configuración del bucket S3.
+
     AWS_ACCESS_KEY_ID = os.environ.get(
         "AWS_ACCESS_KEY_ID", ""
     )
+
     AWS_SECRET_ACCESS_KEY = os.environ.get(
         "AWS_SECRET_ACCESS_KEY", ""
     )
+
     AWS_STORAGE_BUCKET_NAME = _bucket
 
     AWS_S3_REGION_NAME = os.environ.get(
@@ -168,11 +193,13 @@ if _bucket:
     AWS_QUERYSTRING_AUTH = False
 
     # Dominio CDN opcional.
+
     AWS_S3_CUSTOM_DOMAIN = os.environ.get(
         "AWS_S3_CUSTOM_DOMAIN", ""
     ).strip()
 
     # Django 4.2 utiliza STORAGES para definir el backend activo.
+
     STORAGES = {
         "default": {
             "BACKEND": (
@@ -187,6 +214,7 @@ if _bucket:
     }
 
     # URL pública de las imágenes.
+
     if AWS_S3_CUSTOM_DOMAIN:
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     else:
