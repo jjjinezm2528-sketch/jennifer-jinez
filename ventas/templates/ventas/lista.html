@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Ventas | ERP Django{% endblock %}
+{% block nav_ventas %}active{% endblock %}
+
+{% block content %}
+
+<div class="erp-page-title">
+    <div>
+        <h1>💰 Ventas</h1>
+        <p>Consulta y seguimiento de las ventas del ERP.</p>
+    </div>
+
+    <div>
+        <span class="badge-erp-active">
+            {{ ventas|length }} ventas
+        </span>
+    </div>
+</div>
+
+<div class="erp-toolbar">
+    {% if perms.ventas.add_venta %}
+        <a href="{% url 'ventas:crear' %}"
+           class="btn-erp-gold">
+            + Nueva venta
+        </a>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="erp-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Venta</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.pk }}</td>
+                    <td>{{ venta }}</td>
+                    <td>{{ venta.cliente|default:"—" }}</td>
+                    <td>{{ venta.fecha|default:"—" }}</td>
+                    <td>${{ venta.total|floatformat:2 }}</td>
+
+                    <td>
+                        <div class="d-flex gap-2">
+
+                            <a href="{% url 'ventas:detalle' venta.pk %}"
+                               class="btn-erp-primary"
+                               style="text-decoration:none; white-space:nowrap;">
+                                Ver
+                            </a>
+
+                            <a href="{% url 'ventas:ticket' venta.pk %}"
+                               class="btn-erp-gold"
+                               style="text-decoration:none; white-space:nowrap;">
+                                🎟️ Imprimir ticket
+                            </a>
+
+                            {% if perms.ventas.delete_venta %}
+                                <a href="{% url 'ventas:eliminar' venta.pk %}"
+                                   class="btn-erp-danger"
+                                   style="text-decoration:none; white-space:nowrap;">
+                                    🗑️ Eliminar
+                                </a>
+                            {% endif %}
+
+                        </div>
+                    </td>
+                </tr>
+
+            {% empty %}
+                <tr>
+                    <td colspan="6">
+                        No hay ventas registradas.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

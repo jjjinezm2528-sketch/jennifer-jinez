@@ -1,0 +1,370 @@
+
+/* =========================================================
+   ERP DJANGO HALLOWEEN
+   Presentación con todos los textos centrados
+   Fondo continuo claro y oscuro
+   ========================================================= */
+
+/* CONFIGURACIÓN GENERAL */
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f3edf8;
+    background-image: url("/static/images/fantasmas.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.content-wrapper,
+.main-content,
+.content {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* CONTENEDOR PRINCIPAL */
+
+.erp-halloween-home {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+    box-sizing: border-box;
+
+    background-color: transparent;
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.08)
+        ),
+        url("/static/images/fantasmas.png");
+
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.erp-halloween-home,
+.erp-halloween-home * {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   CENTRAR LOS TEXTOS DE LA PÁGINA DE INICIO
+   ========================================================= */
+
+.erp-halloween-home {
+    text-align: center;
+}
+
+/* Título principal */
+
+.erp-halloween-home h1 {
+    width: 100%;
+    margin: 0 auto 10px;
+    text-align: center;
+}
+
+/* Párrafos y subtítulos */
+
+.erp-halloween-home p,
+.erp-halloween-home .halloween-subtitle,
+.erp-halloween-home .halloween-description {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Texto principal debajo del título */
+
+.erp-halloween-home > p {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+/* Centrar encabezados y títulos secundarios */
+
+.erp-halloween-home h2,
+.erp-halloween-home h3,
+.erp-halloween-home h4 {
+    width: 100%;
+    text-align: center;
+}
+
+/* =========================================================
+   CUADRÍCULA DE LOS SEIS MÓDULOS
+   ========================================================= */
+
+.halloween-modules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* =========================================================
+   TARJETAS DE LOS MÓDULOS
+   ========================================================= */
+
+.halloween-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    min-width: 0;
+    min-height: 190px;
+    padding: 20px;
+
+    color: #30213e;
+    background: rgba(255, 255, 255, 0.88);
+
+    border: 1px solid rgba(120, 70, 160, 0.25);
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(35, 20, 50, 0.12);
+
+    text-align: center;
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+/* Efecto al pasar el cursor */
+
+.halloween-card:hover {
+    transform: translateY(-3px);
+    color: #30213e;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 8px 20px rgba(35, 20, 50, 0.2);
+    text-decoration: none;
+}
+
+/* Títulos de las tarjetas */
+
+.halloween-card h2,
+.halloween-card h3 {
+    width: 100%;
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Descripciones de las tarjetas */
+
+.halloween-card p {
+    width: 100%;
+    margin: 0 auto 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Iconos de los módulos */
+
+.halloween-card .halloween-icon {
+    display: block;
+    width: 100%;
+    margin: 0 auto 10px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* =========================================================
+   FLECHAS CENTRADAS DENTRO DE UN CÍRCULO
+   ========================================================= */
+
+.halloween-card .halloween-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+
+    margin: 14px auto 0;
+    padding: 0;
+
+    border: 2px solid currentColor;
+    border-radius: 50%;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+
+    align-self: center;
+
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.halloween-card:hover .halloween-arrow {
+    transform: translateX(3px);
+}
+
+/* =========================================================
+   MODO OSCURO
+   ========================================================= */
+
+html[data-theme="dark"] body {
+    background-color: #100b1b;
+    background-image: url("/static/images/fantasmas_oscuro.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+html[data-theme="dark"] .erp-halloween-home {
+    background-color: transparent;
+    background-image:
+        linear-gradient(
+            rgba(12, 8, 24, 0.12),
+            rgba(12, 8, 24, 0.12)
+        ),
+        url("/static/images/fantasmas_oscuro.png");
+
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .halloween-card {
+    color: #f5efff;
+    background: rgba(30, 22, 43, 0.9);
+    border-color: rgba(190, 150, 230, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="dark"] .halloween-card:hover {
+    color: #ffffff;
+    background: rgba(42, 30, 60, 0.96);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================================
+   TABLETAS Y PANTALLAS MEDIANAS
+   ========================================================= */
+
+@media (max-width: 992px) {
+    .erp-halloween-home {
+        padding: 20px;
+    }
+
+    .halloween-modules {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .halloween-card {
+        min-height: 175px;
+        padding: 18px;
+    }
+}
+
+/* =========================================================
+   CELULARES
+   ========================================================= */
+
+@media (max-width: 576px) {
+    .erp-halloween-home {
+        min-height: 100vh;
+        padding: 14px;
+        background-attachment: scroll;
+    }
+
+    .halloween-modules {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .halloween-card {
+        min-height: 145px;
+        padding: 16px;
+    }
+
+    .erp-halloween-home h1 {
+        font-size: 1.6rem;
+    }
+
+    .halloween-card h2,
+    .halloween-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .halloween-card .halloween-arrow {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+    }
+}
+
+/* =========================================================
+   ESCRITORIOS CON POCA ALTURA
+   ========================================================= */
+
+@media (min-width: 993px) and (max-height: 800px) {
+    .erp-halloween-home {
+        padding: 16px;
+    }
+
+    .erp-halloween-home > p {
+        margin-bottom: 16px;
+    }
+
+    .halloween-modules {
+        gap: 12px;
+    }
+
+    .halloween-card {
+        min-height: 155px;
+        padding: 15px;
+    }
+
+    .halloween-card .halloween-icon {
+        font-size: 1.7rem;
+        margin-bottom: 6px;
+    }
+
+    .halloween-card .halloween-arrow {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        margin-top: 10px;
+    }
+}

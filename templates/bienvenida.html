@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inicio | ERP Django{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'erp_inicio_halloween.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="erp-halloween-home">
+
+    <header class="halloween-intro">
+        <h1>🎃 ERP Django 🎃</h1>
+
+        <p>
+            Sistema de gestión empresarial · UTEC Celaya
+        </p>
+
+        <div class="halloween-badges">
+            <span>Django 4.2 LTS</span>
+            <span>Python 3.11</span>
+            <span>Fable 5 AzulERP</span>
+        </div>
+    </header>
+
+    <div class="halloween-modules">
+        {% for m in modulos %}
+        <a class="halloween-card" href="{{ m.url }}">
+            <span class="halloween-icon">{{ m.icono }}</span>
+
+            <h2>{{ m.nombre }}</h2>
+
+            <p>{{ m.descripcion }}</p>
+
+            <span class="halloween-arrow" aria-hidden="true">
+                →
+            </span>
+        </a>
+        {% empty %}
+        <p class="halloween-empty">
+            No hay módulos disponibles para mostrar.
+        </p>
+        {% endfor %}
+    </div>
+
+</section>
+{% endblock %}
