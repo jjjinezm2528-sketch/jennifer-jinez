@@ -49,37 +49,32 @@ ALLOWED_HOSTS = [
 # APLICACIONES INSTALADAS
 # IMPORTANTE: JAZZMIN ANTES DE DJANGO ADMIN
 # =========================================================
-
+# core/settings.py — actualizar INSTALLED_APPS:
 INSTALLED_APPS = [
-    "jazzmin",
-
-    # Aplicaciones de Django
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.sites",
-
-    # Autenticación con django-allauth
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-
+    'jazzmin',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',
     # Terceros
-    "rest_framework",
-    "rest_framework.authtoken",
-    "whitenoise.runserver_nostatic",
-
-    # Aplicaciones del ERP
-    "core",
-    "clientes",
-    "proveedores",
-    "productos",
-    "ventas",
-    "reportes",
-    "configuracion",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',              # ← nuevo (nombre de app es django_filters)
+    'whitenoise.runserver_nostatic',
+    # Apps del ERP
+    'clientes',
+    'proveedores',
+    'productos',
+    'ventas',
+    'reportes',
+    'configuracion',
+    'catalogo',                    # ← nuevo
 ]
 
 
@@ -114,22 +109,25 @@ ASGI_APPLICATION = "core.asgi.application"
 # =========================================================
 # PLANTILLAS
 # =========================================================
-
+# core/settings.py — actualizar TEMPLATES[0]['OPTIONS']['context_processors']:
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                # Context processor del carrito — W13
+                'catalogo.context_processors.carrito_info',
             ],
         },
     },
 ]
+
 
 
 # =========================================================

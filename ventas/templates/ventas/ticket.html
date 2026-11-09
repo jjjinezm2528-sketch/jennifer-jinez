@@ -1,0 +1,754 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {% if vista_previa %}
+            Vista previa del ticket #{{ venta.pk }}
+        {% else %}
+            Ticket de venta #{{ venta.pk }}
+        {% endif %}
+    </title>
+    <title>Ticket de venta #{{ venta.pk }}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px 12px;
+            background: #eeeaf2;
+            color: #30263a;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .ticket {
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+            padding: 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 22px rgba(75, 31, 111, .15);
+        }
+
+        /* ENCABEZADO MORADO */
+
+        .encabezado {
+            background: #4B1F6F;
+            color: white;
+            text-align: center;
+            padding: 27px 18px 22px;
+            border-bottom: 5px solid #D4AF37;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            color: #FFFFFF;
+            font-size: 25px;
+            letter-spacing: 2px;
+        }
+
+        .encabezado .subtitulo {
+            margin: 9px 0 5px;
+            color: #E8CF78;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .encabezado p {
+            margin: 7px 0 0;
+            color: #FFFFFF;
+            font-size: 11px;
+        }
+
+        .decoracion {
+            margin-top: 13px;
+            color: #D4AF37;
+            font-size: 17px;
+        }
+
+        /* CONTENIDO */
+
+        .contenido {
+            padding: 20px 19px;
+        }
+
+        .titulo-ticket {
+            text-align: center;
+            margin-bottom: 17px;
+        }
+
+        .titulo-ticket h2 {
+            margin: 0;
+            color: #4B1F6F;
+            font-size: 19px;
+        }
+
+        .folio {
+            margin-top: 7px;
+            color: #A17B19;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* DATOS */
+
+        .datos {
+            background: #FAF8FC;
+            border-left: 4px solid #D4AF37;
+            border-radius: 5px;
+            padding: 13px;
+        }
+
+        .datos p {
+            margin: 7px 0;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .datos strong {
+            color: #4B1F6F;
+        }
+
+        /* SEPARADORES */
+
+        .separador {
+            border: 0;
+            border-top: 1px dashed #C6B5D0;
+            margin: 17px 0;
+        }
+
+        /* PRODUCTOS */
+
+        .titulo-productos {
+            color: #4B1F6F;
+            font-size: 14px;
+            margin: 0 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #D4AF37;
+            padding: 25px 22px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, .12);
+        }
+
+        .encabezado {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 5px;
+            color: #4B1F6F;
+            font-size: 23px;
+        }
+
+        .encabezado p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .separador {
+            border: 0;
+            border-top: 1px dashed #888;
+            margin: 14px 0;
+        }
+
+        .datos p {
+            margin: 6px 0;
+            font-size: 13px;
+        }
+
+        .productos {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .productos th {
+            padding: 9px 4px;
+            background: #4B1F6F;
+            color: white;
+            text-align: left;
+            font-size: 10px;
+        }
+
+        .productos td {
+            padding: 10px 4px;
+            border-bottom: 1px solid #EEE7F2;
+            vertical-align: top;
+        }
+
+        .productos tbody tr:nth-child(even) {
+            background: #FAF8FC;
+        }
+
+        .productos small {
+            color: #806D8C;
+            font-size: 10px;
+        }
+
+        .productos th {
+            padding: 8px 3px;
+            border-bottom: 1px solid #444;
+            text-align: left;
+        }
+
+        .productos td {
+            padding: 8px 3px;
+            border-bottom: 1px dashed #ccc;
+            vertical-align: top;
+        }
+
+        .derecha {
+            text-align: right !important;
+        }
+
+        /* TOTALES */
+
+        .totales {
+            margin-top: 15px;
+            padding: 13px;
+            background: #FAF8FC;
+            border-radius: 6px;
+        .totales {
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .totales p {
+            margin: 7px 0;
+            font-size: 12px;
+        }
+
+        .total-final {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px !important;
+            padding-top: 13px;
+            border-top: 2px solid #D4AF37;
+            font-size: 13px;
+        }
+
+        .total-final {
+            color: #4B1F6F;
+            font-size: 20px !important;
+            font-weight: bold;
+        }
+
+        /* MENSAJE FINAL */
+
+        .mensaje-final {
+            padding: 18px 12px;
+            text-align: center;
+            color: #6F5A7B;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .mensaje-final strong {
+            color: #A17B19;
+            font-size: 13px;
+        }
+
+        /* PIE MORADO */
+
+        .pie {
+            padding: 20px 12px;
+            background: #4B1F6F;
+            border-top: 4px solid #D4AF37;
+            text-align: center;
+            color: white;
+        }
+
+        .pie strong {
+            display: block;
+            color: #E8CF78;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .pie p {
+            margin: 8px 0 0;
+            font-size: 10px;
+        }
+
+        /* VISTA PREVIA */
+
+        .etiqueta-vista-previa {
+            max-width: 380px;
+            margin: 0 auto 15px;
+            padding: 12px;
+            text-align: center;
+            color: #4B1F6F;
+            background: #F8F1D9;
+            border: 1px solid #D4AF37;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* BOTONES */
+
+        .mensaje-final {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .acciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+            margin: 20px auto;
+        }
+
+        .boton {
+            display: block;
+            padding: 13px;
+            border: 0;
+            border-radius: 7px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 13px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .boton-imprimir {
+            background: #4B1F6F;
+            color: white;
+        }
+
+        .boton-descargar {
+            background: #D4AF37;
+            color: #30263A;
+        }
+
+        .boton-regresar {
+            background: white;
+            color: #4B1F6F;
+            border: 1px solid #4B1F6F;
+        }
+
+        .boton:hover {
+            opacity: .88;
+        }
+
+        /* IMPRESIÓN TÉRMICA */
+
+        @page {
+            size: 80mm auto;
+            margin: 4mm;
+        }
+
+        @media print {
+
+            body {
+                padding: 0;
+                margin: 0;
+                background: white;
+            }
+
+            .acciones,
+            .no-imprimir {
+                display: none !important;
+            }
+
+            color: #222;
+        }
+
+        .boton-regresar {
+            background: #e1e1e1;
+            color: #333;
+        }
+
+        @page {
+            size: 80mm 200mm;
+            margin: 5mm;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .ticket {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .contenido {
+                padding: 12px;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+            .acciones {
+                display: none !important;
+            }
+
+            .no-imprimir {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% if vista_previa %}
+        <div class="etiqueta-vista-previa no-imprimir">
+            ✦ VISTA PREVIA DEL TICKET ✦
+        </div>
+    {% endif %}
+
+    <main class="ticket">
+
+        <header class="encabezado">
+
+            <h1>SPENDERS</h1>
+
+            <p class="subtitulo">
+                COMPROBANTE DE VENTA
+            </p>
+
+            <p>
+                Sistema de gestión empresarial
+            </p>
+
+            <div class="decoracion">
+                ✦ ━━━━━━━━━ ✦
+            </div>
+
+        </header>
+
+        <section class="contenido">
+
+            <div class="titulo-ticket">
+
+                <h2>TICKET DE VENTA</h2>
+
+                <div class="folio">
+                    FOLIO #{{ venta.pk|stringformat:"05d" }}
+                </div>
+
+            </div>
+
+            <section class="datos">
+
+                <p>
+                    <strong>Cliente:</strong>
+                    {{ venta.cliente }}
+                </p>
+
+                <p>
+                    <strong>Fecha:</strong>
+                    {{ venta.fecha|date:"d/m/Y" }}
+                </p>
+
+                <p>
+                    <strong>Hora:</strong>
+                    {{ venta.fecha|date:"H:i" }}
+                </p>
+
+                <p>
+                    <strong>Venta:</strong>
+                    #{{ venta.pk }}
+                </p>
+
+            </section>
+
+            <hr class="separador">
+
+            <h3 class="titulo-productos">
+                DETALLE DE PRODUCTOS
+            </h3>
+
+            <table class="productos">
+
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th class="derecha">Cant.</th>
+                        <th class="derecha">Importe</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for detalle in venta.detalles.all %}
+
+                    <tr>
+
+                        <td>
+                            {{ detalle.producto.nombre }}
+
+                            <br>
+
+                            <small>
+                                ${{ detalle.precio_unitario|floatformat:2 }}
+                                c/u
+                            </small>
+                        </td>
+
+                        <td class="derecha">
+                            {{ detalle.cantidad }}
+                        </td>
+
+                        <td class="derecha">
+                            ${{ detalle.subtotal|floatformat:2 }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="3">
+                            No hay productos registrados.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            <hr class="separador">
+
+            <section class="totales">
+
+                <p>
+                    <strong>Productos registrados:</strong>
+                    {{ venta.detalles.all|length }}
+                </p>
+
+                <div class="total-final">
+
+                    <span>TOTAL</span>
+
+                    <span>
+                        ${{ venta.total|floatformat:2 }}
+                    </span>
+
+                </div>
+
+            </section>
+
+            <footer class="mensaje-final">
+
+                <strong>
+                    ✦ Gracias por tu preferencia ✦
+                </strong>
+
+                <p>
+                    Conserve este ticket como comprobante
+                    de su compra.
+                </p>
+
+            </footer>
+
+        </section>
+
+        <footer class="pie">
+
+            <strong>
+                ¡GRACIAS POR TU COMPRA!
+            </strong>
+
+            <p>
+                Esperamos verte nuevamente.
+            </p>
+    <main class="ticket">
+
+        <header class="encabezado">
+            <h1>ERP DJANGO</h1>
+            <p>COMPROBANTE DE VENTA</p>
+            <p>¡Gracias por tu compra!</p>
+        </header>
+
+        <hr class="separador">
+
+        <section class="datos">
+            <p>
+                <strong>Ticket:</strong>
+                #{{ venta.pk|stringformat:"05d" }}
+            </p>
+
+            <p>
+                <strong>Fecha:</strong>
+                {{ venta.fecha|date:"d/m/Y" }}
+            </p>
+
+            <p>
+                <strong>Hora:</strong>
+                {{ venta.fecha|date:"H:i" }}
+            </p>
+
+            <p>
+                <strong>Cliente:</strong>
+                {{ venta.cliente }}
+            </p>
+        </section>
+
+        <hr class="separador">
+
+        <table class="productos">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th class="derecha">Cant.</th>
+                    <th class="derecha">Importe</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for detalle in venta.detalles.all %}
+                <tr>
+                    <td>
+                        {{ detalle.producto.nombre }}
+                        <br>
+                        <small>
+                            ${{ detalle.precio_unitario|floatformat:2 }} c/u
+                        </small>
+                    </td>
+
+                    <td class="derecha">
+                        {{ detalle.cantidad }}
+                    </td>
+
+                    <td class="derecha">
+                        ${{ detalle.subtotal|floatformat:2 }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No hay productos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr class="separador">
+
+        <section class="totales">
+            <p>
+                <strong>Total de productos:</strong>
+                {{ venta.detalles.all|length }}
+            </p>
+
+            <p class="total-final">
+                TOTAL: ${{ venta.total|floatformat:2 }}
+            </p>
+        </section>
+
+        <footer class="mensaje-final">
+            <p>Conserve este ticket como comprobante de su compra.</p>
+            <p>Gracias por su preferencia.</p>
+        </footer>
+
+    </main>
+
+    {% if not es_pdf %}
+
+    <nav class="acciones no-imprimir">
+
+        {% if vista_previa %}
+
+            <button
+                type="button"
+                class="boton boton-descargar"
+                onclick="window.print()">
+
+                ⬇ Descargar / Guardar como PDF
+
+            </button>
+
+            <a
+                class="boton boton-regresar"
+                href="{% url 'ventas:ticket' venta.pk %}">
+
+                Volver al ticket
+
+            </a>
+
+        {% else %}
+
+            <button
+                type="button"
+                class="boton boton-imprimir"
+                onclick="window.print()">
+
+                🖨 Imprimir ticket
+
+            </button>
+
+            <a
+                class="boton boton-descargar"
+                href="{% url 'ventas:ticket_pdf' venta.pk %}">
+
+                👁 Vista previa del ticket
+
+            </a>
+
+            <a
+                class="boton boton-regresar"
+                href="{% url 'ventas:lista' %}">
+
+                Volver a ventas
+
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+    <nav class="acciones no-imprimir">
+
+        <button
+            type="button"
+            class="boton boton-imprimir"
+            onclick="window.print()">
+            🖨️ Imprimir ticket
+        </button>
+
+        <a
+            class="boton boton-descargar"
+            href="{% url 'ventas:ticket_pdf' venta.pk %}">
+            ⬇️ Descargar ticket PDF
+        </a>
+
+        <a
+            class="boton boton-regresar"
+            href="{% url 'ventas:lista' %}">
+            Volver a ventas
+        </a>
+
+    </nav>
+    {% endif %}
+
+</body>
+</html>

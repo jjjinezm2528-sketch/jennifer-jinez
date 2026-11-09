@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0A2342">
+
     <title>{% block title %}ERP Django{% endblock %} · Coyotes</title>
 
     <!-- Google Fonts -->
@@ -20,9 +22,9 @@
     <style>
         /* TOKENS MODO DÍA */
         :root, [data-theme="light"] {
-            --clr-navy: #3d1e57;
-            --clr-royal: #4d2c5b;
-            --clr-sky: #b597c4;
+            --clr-navy: #f3dd97;
+            --clr-royal: #f3c8a4;
+            --clr-sky: #c4bc97;
             --clr-ice: #E8F0FB;
             --clr-gold: #B8860B;
             --clr-amber: #D4A017;
@@ -414,32 +416,52 @@
     </a>
 
     <div class="erp-nav-links">
-        <!-- Las rutas usan los nombres definidos en cada urls.py -->
+        <!-- Productos -->
         <a href="{% url 'productos:lista' %}"
            class="erp-nav-link {% block nav_productos %}{% endblock %}">
             Productos
         </a>
 
+        <!-- Clientes -->
         <a href="{% url 'clientes:lista' %}"
            class="erp-nav-link {% block nav_clientes %}{% endblock %}">
             Clientes
         </a>
 
+        <!-- Proveedores -->
         <a href="{% url 'proveedores:lista' %}"
            class="erp-nav-link {% block nav_proveedores %}{% endblock %}">
             Proveedores
         </a>
 
+        <!-- Ventas -->
         <a href="{% url 'ventas:lista' %}"
            class="erp-nav-link {% block nav_ventas %}{% endblock %}">
             Ventas
         </a>
 
+        <!-- Reportes -->
         <a href="{% url 'reportes:inicio' %}"
            class="erp-nav-link {% block nav_reportes %}{% endblock %}">
             Reportes
         </a>
 
+        <!-- Tienda pública — W13 -->
+        <a href="{% url 'catalogo:catalogo' %}"
+           class="erp-nav-link {% block nav_catalogo %}{% endblock %}">
+            🛒 Tienda
+        </a>
+
+        <!-- Contador del carrito -->
+        {% if carrito_total_items > 0 %}
+        <a href="{% url 'catalogo:carrito' %}"
+           class="erp-nav-link"
+           style="position: relative;">
+            🛍️ ({{ carrito_total_items }})
+        </a>
+        {% endif %}
+
+        <!-- Administración -->
         <a href="/admin/" class="erp-nav-link">Admin</a>
 
         {% if user.is_authenticated %}
@@ -494,6 +516,7 @@
 (function () {
     const btn = document.getElementById('themeBtn');
     const html = document.documentElement;
+
     const icons = {
         light: '🌙',
         dark: '☀️'
