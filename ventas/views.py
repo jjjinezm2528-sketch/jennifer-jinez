@@ -2,7 +2,7 @@
 # ventas/views.py
 """Vistas de la app ventas — W07, W08, W09 y tickets PDF."""
 
-from datetime import date
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import (
@@ -22,6 +22,7 @@ from django.shortcuts import (
 )
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import (
     DeleteView,
     DetailView,
@@ -76,6 +77,7 @@ def crear_venta(request):
         if venta_form.is_valid() and detalle_form.is_valid():
             with transaction.atomic():
                 venta = venta_form.save()
+
                 detalle = detalle_form.save(commit=False)
                 detalle.venta = venta
                 detalle.save()
@@ -86,7 +88,6 @@ def crear_venta(request):
                 f'Total: ${venta.total:.2f}',
             )
 
-            # Después de registrar la venta, abrir su ticket.
             return redirect(
                 'ventas:ticket',
                 venta_id=venta.pk,
@@ -102,9 +103,31 @@ def crear_venta(request):
     )
 
 
+def obtener_datos_ticket(venta):
+    """Obtiene los detalles y calcula el importe de cada producto."""
+
+    detalles = venta.detalles.select_related('producto').all()
+    lineas = []
+
+    for detalle in detalles:
+        cantidad = detalle.cantidad
+        precio = detalle.precio_unitario
+
+        importe = Decimal(str(cantidad)) * Decimal(str(precio))
+
+        lineas.append({
+            'producto': detalle.producto,
+            'cantidad': cantidad,
+            'precio_unitario': precio,
+            'importe': importe,
+        })
+
+    return lineas
+
+
 @login_required
 def venta_ticket(request, venta_id: int):
-    """Muestra el ticket de una venta con opciones de impresión y descarga."""
+    """Muestra el ticket normal de una venta."""
 
     venta = get_object_or_404(
         Venta.objects
@@ -113,18 +136,50 @@ def venta_ticket(request, venta_id: int):
         pk=venta_id,
     )
 
+    context = {
+        'venta': venta,
+        'lineas': obtener_datos_ticket(venta),
+        'es_pdf': False,
+        'vista_previa': False,
+    }
+
     return render(
         request,
         'ventas/ticket.html',
-        {
-            'venta': venta,
-            'es_pdf': False,
-        },
+        context,
     )
 
 
 @login_required
-def venta_ticket_pdf(request, venta_id: int) -> HttpResponse:
+def venta_ticket_pdf(request, venta_id: int):
+    """Muestra la vista previa del ticket en pantalla."""
+
+    venta = get_object_or_404(
+        Venta.objects
+        .select_related('cliente')
+        .prefetch_related('detalles__producto'),
+        pk=venta_id,
+    )
+
+    context = {
+        'venta': venta,
+        'lineas': obtener_datos_ticket(venta),
+        'es_pdf': False,
+        'vista_previa': True,
+    }
+
+    return render(
+        request,
+        'ventas/ticket.html',
+        context,
+    )
+
+
+@login_required
+def venta_ticket_descargar_pdf(
+    request,
+    venta_id: int,
+) -> HttpResponse:
     """Genera y descarga el ticket de venta en formato PDF."""
 
     import weasyprint
@@ -136,12 +191,16 @@ def venta_ticket_pdf(request, venta_id: int) -> HttpResponse:
         pk=venta_id,
     )
 
+    context = {
+        'venta': venta,
+        'lineas': obtener_datos_ticket(venta),
+        'es_pdf': True,
+        'vista_previa': False,
+    }
+
     html_string = render_to_string(
         'ventas/ticket.html',
-        {
-            'venta': venta,
-            'es_pdf': True,
-        },
+        context,
         request=request,
     )
 
@@ -156,7 +215,7 @@ def venta_ticket_pdf(request, venta_id: int) -> HttpResponse:
     )
 
     response['Content-Disposition'] = (
-        f'attachment; filename="ticket_{venta.pk:05d}.pdf"'
+        f'attachment; filename="ticket_venta_{venta.pk:05d}.pdf"'
     )
 
     return response
@@ -209,7 +268,7 @@ def venta_pdf(request, venta_id: int) -> HttpResponse:
     context = {
         'venta': venta,
         'config': config,
-        'hoy': date.today(),
+        'hoy': timezone.now(),
     }
 
     html_string = render_to_string(

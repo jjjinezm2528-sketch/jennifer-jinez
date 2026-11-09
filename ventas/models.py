@@ -1,18 +1,7 @@
 
 # ventas/models.py
-"""Modelos de la app ventas — Espiral 2 W05.
+"""Modelos de la app ventas — Espiral 2 W05."""
 
-Modelos implementados:
-    Venta        — encabezado de una venta interna.
-    DetalleVenta — línea de producto dentro de una venta.
-    Pedido       — orden de compra del canal e-commerce (Espiral 5).
-
-Decisiones de diseño aplicadas:
-    D-03: Venta.cliente  → PROTECT.
-    D-04: Venta.total    → @property calculada, no campo de BD.
-    D-05: DetalleVenta.producto → PROTECT.
-    D-06: DetalleVenta.precio_unitario → almacenado (histórico).
-"""
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -23,24 +12,19 @@ from clientes.models import Cliente
 from productos.models import Producto
 
 
-# ── Venta ─────────────────────────────────────────────────────────────────
-
 class Venta(models.Model):
-    """Encabezado de una venta interna.
-
-    El total no se almacena en la BD (D-04); se calcula
-    sumando los subtotales de cada DetalleVenta asociado.
-    """
+    """Encabezado de una venta interna."""
 
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.PROTECT,
         related_name='ventas',
-        verbose_name='Cliente'
+        verbose_name='Cliente',
     )
+
     fecha = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Fecha'
+        verbose_name='Fecha',
     )
 
     class Meta:
@@ -53,41 +37,40 @@ class Venta(models.Model):
 
     @property
     def total(self) -> Decimal:
-        """Calcula el total sumando los subtotales de cada detalle."""
+        """Calcula el total sumando los subtotales de los detalles."""
+
         return sum(
             (d.subtotal for d in self.detalles.all()),
-            Decimal('0.00')
+            Decimal('0.00'),
         )
 
 
-# ── DetalleVenta ───────────────────────────────────────────────────────────
-
 class DetalleVenta(models.Model):
-    """Línea de producto dentro de una venta.
-
-    El precio unitario se conserva como histórico (D-06).
-    """
+    """Línea de producto dentro de una venta."""
 
     venta = models.ForeignKey(
         Venta,
         on_delete=models.CASCADE,
         related_name='detalles',
-        verbose_name='Venta'
+        verbose_name='Venta',
     )
+
     producto = models.ForeignKey(
         Producto,
         on_delete=models.PROTECT,
         related_name='detalles_venta',
-        verbose_name='Producto'
+        verbose_name='Producto',
     )
+
     cantidad = models.PositiveIntegerField(
-        verbose_name='Cantidad'
+        verbose_name='Cantidad',
     )
+
     precio_unitario = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name='Precio unitario',
-        help_text='Precio al momento de la venta (D-06).'
+        help_text='Precio al momento de la venta.',
     )
 
     class Meta:
@@ -99,33 +82,31 @@ class DetalleVenta(models.Model):
 
     @property
     def subtotal(self) -> Decimal:
-        """Calcula el subtotal: cantidad por precio unitario."""
+        """Calcula el subtotal de la línea."""
+
         return self.precio_unitario * self.cantidad
 
     def save(self, *args, **kwargs) -> None:
-        """Captura el precio actual del producto si no se especificó."""
+        """Captura el precio actual si no se especificó."""
+
         if self.precio_unitario is None:
             self.precio_unitario = self.producto.precio
+
         super().save(*args, **kwargs)
 
     def clean(self) -> None:
         """Valida que la cantidad sea al menos 1."""
+
         super().clean()
 
         if self.cantidad is not None and self.cantidad < 1:
             raise ValidationError({
-                'cantidad': 'La cantidad debe ser al menos 1.'
+                'cantidad': 'La cantidad debe ser al menos 1.',
             })
 
 
-# ── Pedido ─────────────────────────────────────────────────────────────────
-
 class Pedido(models.Model):
-    """Orden de compra del canal e-commerce.
-
-    Nota: se implementa en la Espiral 5 (W13–W15).
-    Se define aquí para completar el esquema ER aprobado.
-    """
+    """Orden de compra del canal e-commerce."""
 
     ESTADO_CHOICES = [
         ('pendiente', 'Pendiente de pago'),
@@ -139,36 +120,41 @@ class Pedido(models.Model):
         max_length=20,
         unique=True,
         verbose_name='Número de pedido',
-        help_text='Formato sugerido: PED-YYYY-NNNN'
+        help_text='Formato sugerido: PED-YYYY-NNNN',
     )
+
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.PROTECT,
         related_name='pedidos',
-        verbose_name='Cliente'
+        verbose_name='Cliente',
     )
+
     estado = models.CharField(
         max_length=20,
         choices=ESTADO_CHOICES,
         default='pendiente',
-        verbose_name='Estado'
+        verbose_name='Estado',
     )
+
     fecha_pedido = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Fecha del pedido'
+        verbose_name='Fecha del pedido',
     )
+
     fecha_entrega = models.DateField(
         null=True,
         blank=True,
-        verbose_name='Fecha de entrega'
+        verbose_name='Fecha de entrega',
     )
+
     total_pagado = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal('0.00'))],
-        verbose_name='Total pagado'
+        verbose_name='Total pagado',
     )
 
     class Meta:
@@ -184,6 +170,7 @@ class Pedido(models.Model):
 
     def clean(self) -> None:
         """Valida que la fecha de entrega no sea anterior al pedido."""
+
         super().clean()
 
         if (
@@ -195,5 +182,5 @@ class Pedido(models.Model):
                 'fecha_entrega': (
                     'La fecha de entrega no puede ser anterior '
                     'a la fecha del pedido.'
-                )
+                ),
             })

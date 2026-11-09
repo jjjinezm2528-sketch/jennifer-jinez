@@ -1,16 +1,17 @@
 
 # ventas/urls.py
+
 from django.urls import path
 from . import views
 
 app_name = 'ventas'
 
 urlpatterns = [
-    # Rutas compatibles con las pruebas anteriores
+    # Listado de ventas
     path('', views.VentaListView.as_view(), name='inicio'),
     path('', views.VentaListView.as_view(), name='lista'),
 
-    # Crear y consultar ventas
+    # Crear ventas
     path('nueva/', views.crear_venta, name='crear'),
 
     # Ticket de venta
@@ -23,6 +24,11 @@ urlpatterns = [
         '<int:venta_id>/ticket/pdf/',
         views.venta_ticket_pdf,
         name='ticket_pdf',
+    ),
+    path(
+        '<int:venta_id>/ticket/descargar/',
+        views.venta_ticket_descargar_pdf,
+        name='ticket_descargar_pdf',
     ),
 
     # Detalle y eliminación
@@ -37,7 +43,7 @@ urlpatterns = [
         name='eliminar',
     ),
 
-    # Factura PDF anterior: se conserva
+    # Factura PDF
     path(
         '<int:venta_id>/pdf/',
         views.venta_pdf,
