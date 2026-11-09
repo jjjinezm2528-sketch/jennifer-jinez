@@ -1,18 +1,21 @@
-
 # catalogo/urls.py
-"""URLs del módulo catálogo — W14."""
+"""
+URLs del módulo catálogo — W14 y W15.
+"""
 
 from django.urls import path
 
 from . import views
+from .webhook_views import stripe_webhook
+
 
 app_name = 'catalogo'
 
+
 urlpatterns = [
     # =====================================================
-    # CATÁLOGO PÚBLICO
+    # CATÁLOGO
     # =====================================================
-
     path(
         '',
         views.CatalogoView.as_view(),
@@ -20,9 +23,8 @@ urlpatterns = [
     ),
 
     # =====================================================
-    # CARRITO DE COMPRAS — W13
+    # CARRITO DE COMPRAS
     # =====================================================
-
     path(
         'carrito/',
         views.ver_carrito,
@@ -54,18 +56,13 @@ urlpatterns = [
     ),
 
     # =====================================================
-    # CHECKOUT CON STRIPE — W14
+    # CHECKOUT Y PAGOS
     # =====================================================
-
     path(
         'checkout/',
         views.checkout,
         name='checkout'
     ),
-
-    # =====================================================
-    # RESULTADO DEL PAGO — W14
-    # =====================================================
 
     path(
         'pago-exitoso/<int:pedido_id>/',
@@ -77,5 +74,14 @@ urlpatterns = [
         'pago-error/',
         views.pago_error,
         name='pago_error'
+    ),
+
+    # =====================================================
+    # WEBHOOK DE STRIPE — W15
+    # =====================================================
+    path(
+        'webhook/',
+        stripe_webhook,
+        name='webhook'
     ),
 ]

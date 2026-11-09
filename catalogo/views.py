@@ -1,21 +1,6 @@
 
 # catalogo/views.py
-"""Vistas del módulo de catálogo y carrito — W13.
-
-Módulo público (no requiere autenticación para lectura).
-El carrito se almacena en la sesión Django.
-
-Estructura del carrito en sesión:
-    request.session['carrito'] = {
-        '1': {
-            'nombre':   'Laptop HP',
-            'precio':   '10000.00',
-            'cantidad': 2,
-            'imagen':   'productos/laptop.jpg'
-        },
-        ...
-    }
-"""
+"""Vistas del módulo de catálogo y carrito — W13."""
 
 from decimal import Decimal
 
@@ -260,14 +245,14 @@ def vaciar_carrito(request):
 
 @login_required
 def checkout(request):
-    """Proceso de pago: muestra resumen y crea PaymentIntent de Stripe.
+    """Proceso de pago: muestra resumen del carrito y crea PaymentIntent.
 
     GET:  Muestra resumen del carrito con IVA calculado.
           No crea PaymentIntent (espera a POST).
 
-    POST: Valida carrito → crea Pedido → crea PaymentIntent →
-          retorna client_secret al template para que Stripe.js
-          confirme el pago del lado del cliente.
+    POST: Valida carrito → crea Pedido con snapshot →
+          crea PaymentIntent → retorna client_secret al template
+          para que Stripe.js confirme el pago del lado del cliente.
 
     Redirige a /catalogo/ si el carrito está vacío.
     """
@@ -290,15 +275,27 @@ def checkout(request):
 
             cliente = obtener_o_crear_cliente(request.user)
 
-            # ── 2. Crear el Pedido en estado "pendiente" ───────────────
+            # ── 2. Crear el Pedido con snapshot del carrito ────────────
 
             numero = generar_numero_pedido()
+
+            # Construir el snapshot: lista de dicts serializables
+            snapshot = [
+                {
+                    'producto_id': int(prod_id),
+                    'nombre': datos['nombre'],
+                    'cantidad': int(datos['cantidad']),
+                    'precio': datos['precio'],
+                }
+                for prod_id, datos in carrito.items()
+            ]
 
             pedido = Pedido.objects.create(
                 numero_pedido=numero,
                 cliente=cliente,
                 estado='pendiente',
                 total_pagado=totales['total'],
+                items_snapshot=snapshot,
             )
 
             # ── 3. Crear PaymentIntent en Stripe ───────────────────────
