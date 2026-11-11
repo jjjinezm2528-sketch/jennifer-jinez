@@ -1,0 +1,92 @@
+/* ==========================================================
+   Home ERP · Van Gogh (óleo)
+   Responde al atributo data-theme="light|dark" que ya pone tu base.html
+   ========================================================== */
+
+/* ---------- Paletas de la pintura ---------- */
+:root, [data-theme="dark"] {            /* La noche estrellada */
+  --bg:#0b1640; --p0:#1a3a94; --p1:#2f5bc0; --p2:#5f8be0; --p3:#cfe0f8; --p4:#f2d16b; --p5:#0f2468;
+  --h1:#15245a; --h1a:#22397f; --h1b:#0d1a45; --h2:#0c1536; --h2a:#16245a; --h2b:#080f27;
+  --cy0:#06110d; --cy1:#143328; --cy2:#245a3f; --house:#2f4388; --roof:#1a2a63; --win:#ffd34d;
+  --vg-text:#f6efd2; --vg-muted:#c3cdf0; --vg-card:rgba(9,16,46,.82); --vg-frame:#e8b93c;
+  --night:1; --day:0;
+}
+[data-theme="light"] {                  /* Cielo de día, campo de trigo */
+  --bg:#6fa9e6; --p0:#2a67bf; --p1:#4f94e0; --p2:#8cc4f5; --p3:#ffffff; --p4:#ffe58f; --p5:#1f4f9c;
+  --h1:#dcae35; --h1a:#efc95a; --h1b:#b8861c; --h2:#b88a1c; --h2a:#d4a62d; --h2b:#8a620d;
+  --cy0:#14301a; --cy1:#2d5c33; --cy2:#4f8f52; --house:#f3e6b8; --roof:#c4622d; --win:#caa24a;
+  --vg-text:#2a1f0c; --vg-muted:#5d4a22; --vg-card:rgba(255,246,214,.93); --vg-frame:#8a5a14;
+  --night:0; --day:1;
+}
+
+/* ---------- Lienzo (detrás de todo: z-index negativo) ---------- */
+.stage { position:fixed; z-index:-1; left:50%; top:50%; width:max(100vw,177.78vh); height:max(100vh,56.25vw); transform:translate(-50%,-50%); pointer-events:none; }
+.L { position:absolute; inset:0; width:100%; height:100%; }
+.skybg { fill:var(--bg); }
+.sw { position:absolute; overflow:visible; transform-origin:50% 50%; will-change:transform; animation:vg-spin linear infinite; }
+@keyframes vg-spin { to { transform:rotate(360deg); } }
+.fl { animation:vg-flow linear infinite; }
+@keyframes vg-flow { to { stroke-dashoffset:calc(var(--sum) * -1); } }
+.p0{stroke:var(--p0)} .p1{stroke:var(--p1)} .p2{stroke:var(--p2)} .p3{stroke:var(--p3)} .p4{stroke:var(--p4)} .p5{stroke:var(--p5)}
+.h1a{stroke:var(--h1a)} .h1b{stroke:var(--h1b)} .h2a{stroke:var(--h2a)} .h2b{stroke:var(--h2b)}
+.cy0{stroke:var(--cy0)} .cy1{stroke:var(--cy1)} .cy2{stroke:var(--cy2)}
+.hl { stroke:var(--p3); opacity:.2; }
+.fh1{fill:var(--h1)} .fh2{fill:var(--h2)} .fcyp{fill:var(--cy0)} .fhouse{fill:var(--house)} .froof{fill:var(--roof)} .win{fill:var(--win)}
+.nt { opacity:var(--night); } .dy { opacity:var(--day); }
+/* Textura de lienzo y empaste sobre la pintura */
+.tex { position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; mix-blend-mode:soft-light; opacity:.75; }
+
+/* ---------- Contenido ---------- */
+.vg-home { max-width:1140px; margin:0 auto; padding:.5rem 0 1.5rem; color:var(--vg-text); }
+.hero { display:inline-block; padding:16px 28px 18px; margin-bottom:44px; background:var(--vg-card); color:var(--vg-text); border:3px solid var(--vg-frame); box-shadow:6px 8px 0 rgba(0,0,0,.35); }
+.hero h1 { margin:0; font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:clamp(2.6rem,6vw,4.2rem); line-height:1; }
+.hero p { margin:8px 0 0; color:var(--vg-muted); }
+.hero .badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.hero .badges span { padding:2px 12px; font-size:.78rem; font-weight:600; color:#3a2703; background:linear-gradient(#f7e08a,#b58a1d); border:1px solid #5a3e05; border-radius:2px; }
+
+/* Pared de galería: Ventas es la pieza central */
+.gallery { display:grid; grid-template-columns:repeat(6,1fr); grid-auto-rows:minmax(215px,auto); gap:34px 30px; }
+.g-productos{grid-column:1/3;grid-row:1} .g-clientes{grid-column:1/3;grid-row:2}
+.g-ventas{grid-column:3/5;grid-row:1/3} .g-admin{grid-column:3/5;grid-row:3}
+.g-proveedores{grid-column:5/7;grid-row:1} .g-reportes{grid-column:5/7;grid-row:2}
+
+/* ---------- Marco dorado de cuadro ---------- */
+.frame { position:relative; display:flex; padding:22px; text-decoration:none; transform:rotate(var(--r,0deg)); transition:transform .25s;
+  background:
+    radial-gradient(circle at 15px 15px,#fff3b0 0 4px,#6b4a05 5px 7px,transparent 8px),
+    radial-gradient(circle at calc(100% - 15px) 15px,#fff3b0 0 4px,#6b4a05 5px 7px,transparent 8px),
+    radial-gradient(circle at 15px calc(100% - 15px),#fff3b0 0 4px,#6b4a05 5px 7px,transparent 8px),
+    radial-gradient(circle at calc(100% - 15px) calc(100% - 15px),#fff3b0 0 4px,#6b4a05 5px 7px,transparent 8px),
+    linear-gradient(135deg,#f9e48f 0%,#c99a1d 22%,#fbe79a 45%,#9b6f0a 68%,#f1d173 100%);
+  box-shadow:inset 0 0 0 2px #4d3404, inset 0 0 0 6px rgba(255,244,190,.65), inset 0 0 0 9px #7a5607, 0 18px 30px rgba(0,0,0,.55); }
+.frame:hover { transform:rotate(0) translateY(-6px); }
+.frame:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+.art { position:relative; flex:1; display:flex; flex-direction:column; gap:8px; padding:22px; overflow:hidden; color:#fff7dc;
+  border:4px solid #35240a; box-shadow:inset 0 0 0 3px #d9b24a, inset 0 0 26px 8px rgba(0,0,0,.6); text-shadow:0 1px 3px rgba(0,0,0,.55);
+  background:radial-gradient(circle at 25% 20%,#8b7fb8 0,transparent 55%),linear-gradient(160deg,#3a3550,#5a5478); /* módulo nuevo sin color propio */ }
+.art::before { content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.8;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.035 .6' numOctaves='3' seed='5'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 -.25'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.art::after { content:""; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 3px,transparent 3px 10px); }
+.art > * { position:relative; z-index:1; }
+.ico { font-size:2.4rem; line-height:1; text-shadow:none; }
+.art h2 { margin:0; font-family:'Cormorant Garamond',Georgia,serif; font-weight:700; font-size:2rem; line-height:1.05; color:inherit; }
+.art p { margin:0; opacity:.92; }
+.plaque { margin-top:auto; align-self:flex-start; padding:4px 16px; font-size:.85rem; font-weight:600; color:#3a2703; text-shadow:none;
+  background:linear-gradient(#f7e08a,#b58a1d); border:1px solid #5a3e05; border-radius:2px; box-shadow:0 2px 4px rgba(0,0,0,.45); }
+
+.a-ventas  { background:radial-gradient(circle at 72% 22%,#ffe58f 0,transparent 46%),linear-gradient(160deg,#c9881a,#e8b92e); color:#2a1a05; text-shadow:0 1px 2px rgba(255,240,180,.5); }
+.a-productos { background:radial-gradient(circle at 25% 20%,#5f8be0 0,transparent 55%),linear-gradient(160deg,#1b3b8f,#2d56b5); }
+.a-clientes  { background:radial-gradient(circle at 75% 25%,#4fa77f 0,transparent 55%),linear-gradient(160deg,#17483a,#2e7a5b); }
+.a-proveedores { background:radial-gradient(circle at 25% 20%,#e0793a 0,transparent 55%),linear-gradient(160deg,#7d2a12,#b84e24); }
+.a-reportes  { background:radial-gradient(circle at 75% 25%,#8a74d6 0,transparent 55%),linear-gradient(160deg,#35266f,#5b479f); }
+.a-admin  { background:radial-gradient(circle at 25% 20%,#6f87b3 0,transparent 55%),linear-gradient(160deg,#24324c,#41567d); }
+.g-ventas .ico { font-size:4rem; } .g-ventas h2 { font-size:3rem; } .g-ventas p { font-size:1.1rem; max-width:22ch; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:860px) {
+  .gallery { grid-template-columns:repeat(2,1fr); }
+  .gallery > * { grid-column:auto !important; grid-row:auto !important; }
+  .g-ventas { grid-column:1/-1 !important; }
+}
+@media (max-width:520px) { .gallery { grid-template-columns:1fr; } }
+@media (prefers-reduced-motion:reduce) { .sw, .fl { animation:none; } .frame { transition:none; } }
