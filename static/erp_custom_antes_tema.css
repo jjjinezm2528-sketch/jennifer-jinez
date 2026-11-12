@@ -1,0 +1,367 @@
+
+/* =========================================================
+   ERP DJANGO — TEMA MORADO Y DORADO
+   Animaciones generales para Django + Jazzmin
+   Archivo: static/erp_custom.css
+   ========================================================= */
+
+/* PALETA DE COLORES */
+:root {
+    --erp-purple: #4B1F6F;
+    --erp-purple-light: #7541A6;
+    --erp-purple-dark: #35134F;
+    --erp-gold: #D4AF37;
+    --erp-gold-dark: #B8860B;
+    --erp-shadow: 0 10px 30px rgba(75, 31, 111, .18);
+    --erp-shadow-hover: 0 18px 40px rgba(75, 31, 111, .30);
+}
+
+/* =========================================================
+   1. ANIMACIÓN GENERAL DE LA PÁGINA
+   ========================================================= */
+
+.content-wrapper {
+    animation: erp-entrada .7s ease-out both;
+}
+
+.content-header h1,
+.erp-page-title {
+    animation: erp-titulo .8s ease-out both;
+}
+
+@keyframes erp-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes erp-titulo {
+    from {
+        opacity: 0;
+        transform: translateX(-25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes erp-brillo {
+    0%, 100% {
+        box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+    }
+    50% {
+        box-shadow: 0 0 18px rgba(212, 175, 55, .35);
+    }
+}
+
+/* =========================================================
+   2. MENÚ LATERAL Y BARRA SUPERIOR
+   ========================================================= */
+
+.main-sidebar,
+.sidebar,
+.main-header.navbar {
+    background-color: var(--erp-purple) !important;
+}
+
+.brand-link {
+    border-bottom: 2px solid var(--erp-gold-dark) !important;
+}
+
+.brand-text {
+    color: var(--erp-gold) !important;
+    font-weight: 700 !important;
+}
+
+.nav-sidebar .nav-link {
+    color: rgba(255, 255, 255, .9) !important;
+    border-radius: 7px;
+    margin-bottom: 4px;
+    transition:
+        background-color .3s ease,
+        color .3s ease,
+        padding-left .3s ease,
+        transform .3s ease;
+}
+
+.nav-sidebar .nav-link:hover {
+    background-color: var(--erp-purple-light) !important;
+    color: #FFFFFF !important;
+    padding-left: 1.4rem;
+    transform: translateX(5px);
+}
+
+.nav-sidebar .nav-link.active {
+    background-color: var(--erp-purple-light) !important;
+    color: #FFFFFF !important;
+    box-shadow: inset 4px 0 var(--erp-gold);
+}
+
+.nav-sidebar .nav-icon {
+    transition: transform .3s ease, color .3s ease;
+}
+
+.nav-sidebar .nav-link:hover .nav-icon {
+    transform: scale(1.18) rotate(-5deg);
+    color: var(--erp-gold) !important;
+}
+
+/* =========================================================
+   3. TARJETAS DE MÓDULOS Y CONTENEDORES
+   ========================================================= */
+
+.erp-module-card,
+.erp-card,
+.card {
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease,
+        border-color .35s ease;
+}
+
+.erp-module-card {
+    cursor: pointer;
+}
+
+.erp-module-card:hover,
+.erp-card:hover {
+    transform: translateY(-9px) scale(1.02);
+    box-shadow: var(--erp-shadow-hover);
+    border-color: var(--erp-gold-dark);
+}
+
+/* Las tarjetas normales se elevan ligeramente */
+.card:hover {
+    box-shadow: var(--erp-shadow);
+}
+
+/* Encabezados de tarjetas */
+.card-header {
+    transition: background-color .3s ease, color .3s ease;
+}
+
+/* =========================================================
+   4. BOTONES
+   ========================================================= */
+
+.btn,
+button,
+input[type="submit"],
+input[type="button"] {
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        background-color .25s ease,
+        border-color .25s ease,
+        filter .25s ease;
+}
+
+.btn:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(75, 31, 111, .25);
+}
+
+/* Botón principal */
+.btn-primary {
+    background-color: var(--erp-purple) !important;
+    border-color: var(--erp-purple) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--erp-purple-light) !important;
+    border-color: var(--erp-purple-light) !important;
+}
+
+/* Botón dorado personalizado */
+.btn-erp-gold {
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.btn-erp-gold:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 22px rgba(184, 134, 11, .4);
+}
+
+/* =========================================================
+   5. TABLAS
+   ========================================================= */
+
+.table tbody tr {
+    transition:
+        background-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(117, 65, 166, .10);
+}
+
+.table tbody td,
+.table thead th {
+    transition: color .2s ease;
+}
+
+/* =========================================================
+   6. FORMULARIOS E INPUTS
+   ========================================================= */
+
+.form-control,
+.form-select,
+select,
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="date"] {
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        background-color .25s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+select:focus,
+textarea:focus,
+input:focus {
+    border-color: var(--erp-purple-light) !important;
+    box-shadow: 0 0 0 .2rem rgba(117, 65, 166, .18) !important;
+    outline: none;
+}
+
+/* Etiquetas de formularios */
+label {
+    transition: color .2s ease;
+}
+
+.form-group:focus-within label,
+.form-group:focus-within .col-form-label {
+    color: var(--erp-purple-light);
+}
+
+/* =========================================================
+   7. ENLACES E ICONOS
+   ========================================================= */
+
+a {
+    transition: color .2s ease, opacity .2s ease;
+}
+
+.content-wrapper a:hover {
+    color: var(--erp-purple-light);
+}
+
+.content-wrapper .fas,
+.content-wrapper .far,
+.content-wrapper .fa,
+.content-wrapper .fa-solid {
+    transition: transform .25s ease, color .25s ease;
+}
+
+.content-wrapper a:hover .fas,
+.content-wrapper a:hover .far,
+.content-wrapper a:hover .fa,
+.content-wrapper a:hover .fa-solid {
+    transform: scale(1.12);
+}
+
+/* =========================================================
+   8. ETIQUETAS DE ESTADO Y BADGES
+   ========================================================= */
+
+.badge {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.08);
+    box-shadow: 0 3px 10px rgba(75, 31, 111, .2);
+}
+
+/* =========================================================
+   9. MENSAJES Y ALERTAS
+   ========================================================= */
+
+.alert,
+.callout {
+    animation: erp-entrada .45s ease-out both;
+}
+
+/* =========================================================
+   10. PESTAÑAS
+   ========================================================= */
+
+.nav-tabs .nav-link {
+    transition:
+        color .25s ease,
+        background-color .25s ease,
+        border-color .25s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--erp-purple-light);
+}
+
+.nav-tabs .nav-link.active {
+    border-bottom-color: var(--erp-gold-dark);
+}
+
+/* =========================================================
+   11. PIE DE PÁGINA
+   ========================================================= */
+
+.main-footer {
+    border-top: 2px solid var(--erp-gold-dark);
+}
+
+/* =========================================================
+   12. UTILIDADES DE COLOR
+   ========================================================= */
+
+.text-gold {
+    color: var(--erp-gold) !important;
+}
+
+.text-navy {
+    color: var(--erp-purple) !important;
+}
+
+.bg-navy {
+    background-color: var(--erp-purple) !important;
+}
+
+.border-gold {
+    border-color: var(--erp-gold-dark) !important;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', Consolas, monospace !important;
+    font-size: .9em;
+}
+
+/* =========================================================
+   13. ACCESIBILIDAD
+   Reducir movimiento si el usuario lo prefiere
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+        transform: none !important;
+    }
+}

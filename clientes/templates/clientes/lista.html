@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes | ERP Django{% endblock %}
+
+{% block content %}
+
+<div class="erp-page-title">
+    <div>
+        <h1>👥 Clientes</h1>
+        <p>Administración de clientes del ERP.</p>
+    </div>
+
+    <div>
+        <span class="badge-erp-active">
+            {{ page_obj.paginator.count|default:clientes|length }} clientes
+        </span>
+    </div>
+</div>
+
+<div class="erp-toolbar">
+    {% if perms.clientes.add_cliente %}
+        <a href="{% url 'clientes:crear' %}" class="btn-erp-gold">
+            + Nuevo cliente
+        </a>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="erp-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Correo electrónico</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.pk }}</td>
+
+                    <td>
+                        <a href="{% url 'clientes:detalle' cliente.pk %}">
+                            {{ cliente }}
+                        </a>
+                    </td>
+
+                    <td>{{ cliente.email|default:"—" }}</td>
+
+                    <td>{{ cliente.telefono|default:"—" }}</td>
+
+                    <td>
+                        {% if cliente.activo %}
+                            <span class="badge-erp-active">Activo</span>
+                        {% else %}
+                            <span class="badge-erp-inactive">Inactivo</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'clientes:detalle' cliente.pk %}"
+                               class="btn-erp-primary">
+                                Ver
+                            </a>
+
+                            {% if perms.clientes.delete_cliente %}
+                                <a href="{% url 'clientes:eliminar' cliente.pk %}"
+                                   class="btn-erp-danger">
+                                    🗑️ Eliminar
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">
+                        No hay clientes registrados.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+    <div class="erp-pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">Primera</a>
+            <a href="?page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }}
+            de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">
+                Última
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

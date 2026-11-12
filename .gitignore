@@ -1,0 +1,52 @@
+
+# Entornos virtuales
+env_erp/
+env_erp_respaldo/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Variables y secretos
+.env
+.env.*
+!.env.example
+
+# Bases de datos locales
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+*.sqlite3-journal
+
+# Archivos estáticos y archivos subidos
+staticfiles/
+media/
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Archivos temporales y respaldos
+*.tmp
+*.bak
+exclude_temp.txt
+
+# Carpetas y archivos accidentales en la raíz
+/WorkSpace_ERP/
+/.db
+/CACHED
+/\[auth\]
+/\[internal\]
+/dir
+/tatus
+/docker
+/docker-compose
+/exporting
+/resolving
+/git
+/iniciar_seion.bat
+

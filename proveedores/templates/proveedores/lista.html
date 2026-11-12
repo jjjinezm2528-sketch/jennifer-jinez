@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Proveedores | ERP Django{% endblock %}
+{% block nav_proveedores %}active{% endblock %}
+
+{% block content %}
+
+<div class="erp-page-title">
+    <div>
+        <h1>🏭 Proveedores</h1>
+        <p>Administración de proveedores del ERP.</p>
+    </div>
+
+    <div>
+        <span class="badge-erp-active">
+            {{ proveedores|length }} proveedores
+        </span>
+    </div>
+</div>
+
+<div class="erp-toolbar">
+    {% if user.is_authenticated %}
+        <a href="{% url 'proveedores:crear' %}"
+           class="btn-erp-gold">
+            + Nuevo proveedor
+        </a>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="erp-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Proveedor</th>
+                <th>Correo electrónico</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for proveedor in proveedores %}
+                <tr>
+                    <td>{{ proveedor.pk }}</td>
+                    <td>{{ proveedor }}</td>
+                    <td>{{ proveedor.email|default:"—" }}</td>
+                    <td>{{ proveedor.telefono|default:"—" }}</td>
+                    <td>
+                        {% if proveedor.activo %}
+                            <span class="badge-erp-active">
+                                Activo
+                            </span>
+                        {% else %}
+                            <span class="badge-erp-inactive">
+                                Inactivo
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">
+                        No hay proveedores registrados.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
