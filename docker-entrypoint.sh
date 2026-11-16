@@ -1,23 +1,20 @@
 #!/bin/sh
-# docker-entrypoint.sh
-# Punto de entrada unificado para el contenedor ERP Django.
-# Se ejecuta en LOCAL (docker-compose) y en PRODUCCIÓN (Render).
-# ─────────────────────────────────────────────────────────────────
-set -e   # detener si cualquier comando falla
+# Punto de entrada del contenedor ERP Django (local con docker-compose y Render)
+set -e
 
-echo "==> [entrypoint] Ejecutando migraciones de base de datos..."
+echo "==> [entrypoint] Ejecutando migraciones..."
 python manage.py migrate --noinput
 
 echo "==> [entrypoint] Recolectando archivos estáticos..."
-python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
 
-echo "==> [entrypoint] Verificando la configuración de Django..."
-python manage.py check --deploy 2>/dev/null || python manage.py check
+echo "==> [entrypoint] Verificando configuración de Django..."
+python manage.py check
 
-echo "==> [entrypoint] Iniciando Gunicorn..."
-exec gunicorn core.wsgi \
-    --bind 0.0.0.0:8000 \
-    --workers 2 \
+echo "==> [entrypoint] Iniciando Gunicorn en el puerto ${PORT:-8000}..."
+exec gunicorn core.wsgi:application \
+    --bind "0.0.0.0:${PORT:-8000}" \
+    --workers "${WEB_CONCURRENCY:-2}" \
     --timeout 120 \
     --log-file - \
     --access-logfile -
