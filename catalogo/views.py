@@ -390,13 +390,25 @@ def checkout(request):
 
 
 def pago_exitoso(request, pedido_id: int):
-    """Confirmación post-pago.
+    """Muestra la confirmación únicamente cuando el pago está registrado."""
 
-    Vacía el carrito de la sesión y muestra el número de pedido.
-    Stripe redirige aquí tras `stripe.confirmCardPayment`.
-    """
     pedido = get_object_or_404(Pedido, pk=pedido_id)
 
+    if pedido.estado != 'pagado':
+        logger.info(
+            'El pedido %s todavía no está confirmado. Estado: %s',
+            pedido.numero_pedido,
+            pedido.estado,
+        )
+
+        return render(
+            request,
+            'catalogo/pago_pendiente.html',
+            {'pedido': pedido},
+            status=200,
+        )
+
+    # Vaciar el carrito solamente después de confirmar el pago.
     _guardar_carrito(request, {})
     request.session.pop('pedido_pendiente_id', None)
 
@@ -405,10 +417,10 @@ def pago_exitoso(request, pedido_id: int):
         f'¡Pago exitoso! Tu pedido {pedido.numero_pedido} '
         f'está confirmado. Total: ${pedido.total_pagado}'
     )
+
     return render(request, 'catalogo/pago_exitoso.html', {
         'pedido': pedido,
     })
-
 
 def pago_error(request):
     """Vista de error de pago — muestra mensaje y permite reintentar."""

@@ -1,5 +1,4 @@
 
-# core/settings.py
 """
 Configuración principal del ERP Django.
 Entorno de desarrollo y configuración base compartida con producción.
@@ -49,32 +48,34 @@ ALLOWED_HOSTS = [
 # APLICACIONES INSTALADAS
 # IMPORTANTE: JAZZMIN ANTES DE DJANGO ADMIN
 # =========================================================
-# core/settings.py — actualizar INSTALLED_APPS:
+
 INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
+    "jazzmin",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+
     # Terceros
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'django_filters',              # ← nuevo (nombre de app es django_filters)
-    'whitenoise.runserver_nostatic',
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "django_filters",
+    "whitenoise.runserver_nostatic",
+
     # Apps del ERP
-    'clientes',
-    'proveedores',
-    'productos',
-    'ventas',
-    'reportes',
-    'configuracion',
-    'catalogo',                    # ← nuevo
+    "clientes",
+    "proveedores",
+    "productos",
+    "ventas",
+    "reportes",
+    "configuracion",
+    "catalogo",
 ]
 
 
@@ -109,25 +110,25 @@ ASGI_APPLICATION = "core.asgi.application"
 # =========================================================
 # PLANTILLAS
 # =========================================================
-# core/settings.py — actualizar TEMPLATES[0]['OPTIONS']['context_processors']:
+
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+
                 # Context processor del carrito — W13
-                'catalogo.context_processors.carrito_info',
+                "catalogo.context_processors.carrito_info",
             ],
         },
     },
 ]
-
 
 
 # =========================================================
@@ -195,7 +196,6 @@ LOGOUT_REDIRECT_URL = "/"
 # CONFIGURACIÓN DE CUENTAS ALLAUTH
 # =========================================================
 
-# Se conserva la configuración original de cuentas.
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = True
@@ -287,12 +287,130 @@ REST_FRAMEWORK = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# core/settings.py — agregar al final (antes de JAZZMIN_SETTINGS):
 
-# ── STRIPE (Pasarela de pago) ──────────────────────────────────────────────
-STRIPE_SECRET_KEY     = env('STRIPE_SECRET_KEY',     default='sk_test_placeholder')
-STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='pk_test_placeholder')
-STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default='whsec_placeholder')
+# =========================================================
+# STRIPE — PASARELA DE PAGO
+# =========================================================
+
+STRIPE_SECRET_KEY = env(
+    "STRIPE_SECRET_KEY",
+    default="sk_test_placeholder",
+)
+
+STRIPE_PUBLISHABLE_KEY = env(
+    "STRIPE_PUBLISHABLE_KEY",
+    default="pk_test_placeholder",
+)
+
+STRIPE_WEBHOOK_SECRET = env(
+    "STRIPE_WEBHOOK_SECRET",
+    default="whsec_placeholder",
+)
+
+
+# =========================================================
+# CELERY — TAREAS ASÍNCRONAS
+# ERP DJANGO · REDIS · WINDOWS · DOCKER
+# =========================================================
+
+# ---------------------------------------------------------
+# BROKER — REDIS
+# ---------------------------------------------------------
+# Local Windows:
+# redis://127.0.0.1:6379/0
+#
+# Docker:
+# redis://redis:6379/0
+#
+# CELERY_BROKER_URL tiene prioridad sobre REDIS_URL.
+
+CELERY_BROKER_URL = env(
+    "CELERY_BROKER_URL",
+    default=env(
+        "REDIS_URL",
+        default="redis://127.0.0.1:6379/0",
+    ),
+)
+
+
+# ---------------------------------------------------------
+# BACKEND — RESULTADOS DE TAREAS
+# ---------------------------------------------------------
+# Redis DB 1 para resultados, separado del broker DB 0.
+
+CELERY_RESULT_BACKEND = env(
+    "CELERY_RESULT_BACKEND",
+    default=env(
+        "REDIS_CACHE_URL",
+        default="redis://127.0.0.1:6379/1",
+    ),
+)
+
+
+# ---------------------------------------------------------
+# SERIALIZACIÓN Y SEGURIDAD
+# ---------------------------------------------------------
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+
+# ---------------------------------------------------------
+# ZONA HORARIA
+# ---------------------------------------------------------
+
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+
+
+# ---------------------------------------------------------
+# CONTROL DE EJECUCIÓN
+# ---------------------------------------------------------
+
+CELERY_TASK_TRACK_STARTED = True
+
+CELERY_TASK_TIME_LIMIT = 1800
+CELERY_TASK_SOFT_TIME_LIMIT = 1500
+
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000
+
+
+# ---------------------------------------------------------
+# CONEXIÓN Y RECUPERACIÓN DEL BROKER
+# ---------------------------------------------------------
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_CONNECTION_MAX_RETRIES = 10
+
+CELERY_BROKER_HEARTBEAT = 10
+
+
+# ---------------------------------------------------------
+# RESULTADOS DE TAREAS
+# ---------------------------------------------------------
+
+CELERY_TASK_IGNORE_RESULT = False
+CELERY_RESULT_EXPIRES = 86400
+
+
+# ---------------------------------------------------------
+# COLA PREDETERMINADA
+# ---------------------------------------------------------
+
+CELERY_TASK_DEFAULT_QUEUE = "default"
+CELERY_TASK_DEFAULT_EXCHANGE = "default"
+CELERY_TASK_DEFAULT_ROUTING_KEY = "default"
+
+
+# ---------------------------------------------------------
+# PRUEBAS
+# ---------------------------------------------------------
+
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_EAGER_PROPAGATES = True
+
 
 # =========================================================
 # JAZZMIN — PERSONALIZACIÓN DEL ADMINISTRADOR

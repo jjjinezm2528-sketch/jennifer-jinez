@@ -1,6 +1,13 @@
-# docker-compose.yml — ERP Django con WeasyPrint (entorno local tipo producción)
+
+# docker-compose.yml
+# ERP Django con WeasyPrint, PostgreSQL, Redis y Celery
+# Entorno local tipo producción — W16
 
 services:
+
+  # =========================================================
+  # BASE DE DATOS POSTGRESQL
+  # =========================================================
   db:
     image: postgres:15-alpine
     restart: unless-stopped
@@ -13,11 +20,16 @@ services:
     ports:
       - "127.0.0.1:5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-erp_user} -d ${POSTGRES_DB:-erp_db}"]
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-erp_user} -d ${POSTGRES_DB:-erp_db}
       interval: 5s
       timeout: 5s
       retries: 10
 
+  # =========================================================
+  # REDIS — BROKER Y BACKEND DE CELERY
+  # =========================================================
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -29,14 +41,15 @@ services:
       timeout: 3s
       retries: 10
 
+  # =========================================================
+  # APLICACIÓN DJANGO
+  # =========================================================
   web:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
-      # Solo desarrollo: refleja cambios de código sin reconstruir la imagen.
-      # En producción (Render) no se usa; ahí corre el código de la imagen.
       - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
@@ -68,6 +81,62 @@ services:
       start_period: 60s
       retries: 3
 
+  # =========================================================
+  # CELERY WORKER — W16
+  # =========================================================
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: celery -A core worker -l info -Q default
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings_prod
+      SECRET_KEY: ${SECRET_KEY:?Define SECRET_KEY en tu archivo .env}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-erp_user}:${POSTGRES_PASSWORD:-erp_pass_local}@db:5432/${POSTGRES_DB:-erp_db}
+      DATABASE_SSL_REQUIRE: "False"
+      REDIS_URL: redis://redis:6379/0
+      REDIS_CACHE_URL: redis://redis:6379/1
+
+  # =========================================================
+  # FLOWER — MONITOREO DE CELERY
+  # =========================================================
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: celery -A core flower --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings_prod
+      SECRET_KEY: ${SECRET_KEY:?Define SECRET_KEY en tu archivo .env}
+      REDIS_URL: redis://redis:6379/0
+      REDIS_CACHE_URL: redis://redis:6379/1
+
+# =========================================================
+# VOLÚMENES PERSISTENTES
+# =========================================================
 volumes:
   postgres_data:
   static_volume:

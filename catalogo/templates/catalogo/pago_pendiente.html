@@ -1,0 +1,36 @@
+ 
+{% extends "base.html" %}
+
+{% block title %}Pago pendiente{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:center;align-items:center;min-height:60vh;">
+    <div class="erp-card" style="max-width:520px;text-align:center;">
+        <div style="font-size:4rem;margin-bottom:1rem;">⏳</div>
+
+        <h2 style="font-family:'Playfair Display',serif;color:var(--clr-navy);">
+            Estamos verificando tu pago
+        </h2>
+
+        <p style="color:var(--clr-muted);margin-bottom:1.5rem;">
+            Tu pedido fue recibido, pero todavía no tenemos la confirmación
+            definitiva de Stripe. No necesitas realizar otro pago.
+        </p>
+
+        <div class="erp-card" style="background:var(--clr-ice);text-align:left;">
+            <strong>Número de pedido:</strong>
+            <p>{{ pedido.numero_pedido }}</p>
+
+            <strong>Total:</strong>
+            <p>${{ pedido.total_pagado }}</p>
+
+            <strong>Estado:</strong>
+            <p>{{ pedido.get_estado_display }}</p>
+        </div>
+
+        <a href="{% url 'catalogo:carrito' %}" class="btn-erp-primary">
+            Volver al carrito
+        </a>
+    </div>
+</div>
+{% endblock %}
