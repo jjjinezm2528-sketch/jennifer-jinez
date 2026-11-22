@@ -1,14 +1,15 @@
+
 # ventas/tasks.py
-"""Tareas asíncronas de la app ventas — W17.
+"""Tareas de la aplicación ventas.
 
-W17 implementa el envío real de correos con django-anymail + SendGrid.
+W17: envío de correos mediante django-anymail + SendGrid.
 
-Idempotencia:
-    Pedido.correo_enviado=True previene envíos duplicados si la tarea
-    se llama más de una vez para el mismo pedido.
+El envío directo permite enviar confirmaciones sin depender de un
+Celery Worker. La tarea Celery se conserva para instalaciones que
+sí tengan un trabajador configurado.
 """
+
 import logging
-from decimal import Decimal
 
 from celery import shared_task
 from django.conf import settings
@@ -19,6 +20,134 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 
+def enviar_confirmacion_pedido_directo(pedido_id: int) -> dict:
+    """
+    Envía directamente la confirmación de un pedido.
+
+    No necesita Redis ni un Celery Worker.
+
+    La función evita volver a enviar un correo si el pedido ya está
+    marcado como enviado.
+    """
+    from configuracion.models import ConfiguracionERP
+    from ventas.models import Pedido
+
+    try:
+        pedido = Pedido.objects.select_related('cliente').get(pk=pedido_id)
+    except Pedido.DoesNotExist:
+        logger.error(
+            '[correo_confirmacion] Pedido %s no existe.',
+            pedido_id
+        )
+        return {
+            'estado': 'error',
+            'razon': 'Pedido no encontrado',
+            'pedido_id': pedido_id,
+        }
+
+    # Evitar envíos duplicados cuando el correo ya fue registrado.
+    if pedido.correo_enviado:
+        logger.info(
+            '[correo_confirmacion] Pedido %s: correo ya enviado. '
+            'No se repetirá el envío.',
+            pedido.numero_pedido
+        )
+        return {
+            'estado': 'skip',
+            'pedido_id': pedido_id,
+            'razon': 'correo ya enviado',
+        }
+
+    config = ConfiguracionERP.get_instance()
+
+    items = pedido.items_snapshot or []
+
+    url_pedido = (
+        'https://erp-django-njx2.onrender.com'
+        f'/ventas/{pedido.pk}/'
+    )
+
+    contexto = {
+        'pedido': pedido,
+        'config': config,
+        'items': items,
+        'url_pedido': url_pedido,
+    }
+
+    asunto = (
+        f'Confirmación de pedido {pedido.numero_pedido} '
+        f'— {config.nombre_empresa}'
+    )
+
+    # Generar las versiones de texto y HTML.
+    texto_plano = render_to_string(
+        'emails/confirmacion_pedido.txt',
+        contexto
+    )
+
+    html_body = render_to_string(
+        'emails/confirmacion_pedido.html',
+        contexto
+    )
+
+    correo_destino = pedido.cliente.correo
+    correo_origen = settings.DEFAULT_FROM_EMAIL
+
+    if not correo_destino:
+        raise ValueError(
+            f'El pedido {pedido.numero_pedido} no tiene '
+            'un correo electrónico de destino.'
+        )
+
+    if not correo_origen:
+        raise ValueError(
+            'DEFAULT_FROM_EMAIL no está configurado.'
+        )
+
+    mensaje = EmailMultiAlternatives(
+        subject=asunto,
+        body=texto_plano,
+        from_email=correo_origen,
+        to=[correo_destino],
+    )
+
+    mensaje.attach_alternative(html_body, 'text/html')
+
+    try:
+        # Enviar usando el backend configurado en Django.
+        enviados = mensaje.send(fail_silently=False)
+
+        if enviados != 1:
+            raise RuntimeError(
+                'El backend de correo no confirmó el envío.'
+            )
+
+        # Marcar como enviado después de que el backend acepte el correo.
+        pedido.correo_enviado = True
+        pedido.save(update_fields=['correo_enviado'])
+
+        logger.info(
+            '[correo_confirmacion] Correo aceptado por el backend '
+            'para %s. Pedido: %s.',
+            correo_destino,
+            pedido.numero_pedido
+        )
+
+        return {
+            'estado': 'ok',
+            'pedido_id': pedido_id,
+            'correo': correo_destino,
+        }
+
+    except Exception:
+        logger.exception(
+            '[correo_confirmacion] Error al enviar el correo '
+            'del pedido %s.',
+            pedido.numero_pedido
+        )
+        raise
+
+
 @shared_task(
     bind=True,
     max_retries=3,
@@ -26,107 +155,24 @@ logger = logging.getLogger(__name__)
     name='ventas.enviar_confirmacion_pedido',
 )
 def enviar_confirmacion_pedido(self, pedido_id: int) -> dict:
-    """Envía el correo de confirmación de pedido al cliente.
-
-    Garantías:
-        - Idempotente: si correo_enviado=True, aborta sin error.
-        - Retry automático hasta 3 veces en caso de fallo de SendGrid.
-
-    Args:
-        pedido_id: ID del Pedido confirmado.
-
-    Returns:
-        dict con estado, pedido_id y correo del destinatario.
     """
-    from configuracion.models import ConfiguracionERP  # import local
-    from ventas.models        import Pedido             # import local
+    Tarea Celery para enviar la confirmación.
 
+    Se conserva para cuando exista un Celery Worker.
+    """
     try:
-        pedido = Pedido.objects.select_related('cliente').get(pk=pedido_id)
-    except Pedido.DoesNotExist:
-        logger.error(
-            f'[correo_confirmacion] Pedido {pedido_id} no existe.'
-        )
-        return {'estado': 'error', 'razon': 'Pedido no encontrado'}
-
-    # ── Verificación de idempotencia ────────────────────────────────────
-    if pedido.correo_enviado:
-        logger.info(
-            f'[correo_confirmacion] Pedido {pedido.numero_pedido}: '
-            f'correo ya enviado anteriormente — skip.'
-        )
-        return {
-            'estado':    'skip',
-            'pedido_id': pedido_id,
-            'razon':     'correo ya enviado',
-        }
-
-    config = ConfiguracionERP.get_instance()
-
-    # ── Construir contexto del correo ───────────────────────────────────
-    items = pedido.items_snapshot or []
-    url_pedido = (
-        f"https://erp-django-utec.onrender.com"
-        f"/ventas/{pedido.pk}/"
-    )
-
-    contexto = {
-        'pedido':     pedido,
-        'config':     config,
-        'items':      items,
-        'url_pedido': url_pedido,
-    }
-
-    # ── Renderizar templates ────────────────────────────────────────────
-    # render_to_string sin request (las tareas Celery no tienen request)
-    asunto     = (
-        f'Confirmación de pedido {pedido.numero_pedido} '
-        f'— {config.nombre_empresa}'
-    )
-    texto_plano = render_to_string(
-        'emails/confirmacion_pedido.txt', contexto
-    )
-    html_body   = render_to_string(
-        'emails/confirmacion_pedido.html', contexto
-    )
-
-    # ── Construir el correo ────────────────────────────────────────────
-    correo_destino = pedido.cliente.correo
-    correo_origen  = settings.DEFAULT_FROM_EMAIL
-
-    mensaje = EmailMultiAlternatives(
-        subject      = asunto,
-        body         = texto_plano,      # versión texto plano (fallback)
-        from_email   = correo_origen,
-        to           = [correo_destino],
-    )
-    mensaje.attach_alternative(html_body, 'text/html')
-
-    # ── Enviar y manejar errores ───────────────────────────────────────
-    try:
-        mensaje.send()
-        logger.info(
-            f'[correo_confirmacion] Correo enviado a {correo_destino} '
-            f'para pedido {pedido.numero_pedido}.'
-        )
-
-        # Marcar como enviado para evitar duplicados
-        pedido.correo_enviado = True
-        pedido.save(update_fields=['correo_enviado'])
-
-        return {
-            'estado':    'ok',
-            'pedido_id': pedido_id,
-            'correo':    correo_destino,
-        }
+        return enviar_confirmacion_pedido_directo(pedido_id)
 
     except Exception as exc:
-        logger.error(
-            f'[correo_confirmacion] Error al enviar correo para pedido '
-            f'{pedido.numero_pedido}: {exc}'
+        logger.exception(
+            '[correo_confirmacion] Error en tarea Celery para pedido %s.',
+            pedido_id
         )
-        # Reintento automático con Celery (hasta max_retries=3)
-        raise self.retry(exc=exc, countdown=60 * (self.request.retries + 1))
+
+        raise self.retry(
+            exc=exc,
+            countdown=60 * (self.request.retries + 1)
+        )
 
 
 @shared_task(
@@ -135,93 +181,114 @@ def enviar_confirmacion_pedido(self, pedido_id: int) -> dict:
     name='ventas.verificar_stock_bajo',
 )
 def verificar_stock_bajo(self, umbral: int = 5) -> dict:
-    """Verifica productos con stock bajo y envía alerta al admin.
-
-    W17: Si hay productos bajo el umbral, envía correo a ADMINS[0].
-
-    Args:
-        umbral: cantidad mínima antes de alertar (default: 5).
-
-    Returns:
-        dict con conteo y lista de productos con stock bajo.
     """
-    from productos.models import Producto   # import local
+    Verifica productos con stock bajo y envía una alerta al administrador.
+    """
+    from productos.models import Producto
 
     productos_bajos = list(
         Producto.objects
         .select_related('categoria')
         .filter(activo=True, stock__lt=umbral)
-        .values('pk', 'nombre', 'stock', 'categoria__nombre')
+        .values(
+            'pk',
+            'nombre',
+            'stock',
+            'categoria__nombre'
+        )
         .order_by('stock')
     )
 
     if not productos_bajos:
         logger.info(
-            f'[stock_bajo] Todos los productos tienen stock ≥ {umbral}. OK.'
+            '[stock_bajo] Todos los productos tienen stock >= %s. OK.',
+            umbral
         )
-        return {'umbral': umbral, 'total': 0, 'productos_bajos': []}
+        return {
+            'umbral': umbral,
+            'total': 0,
+            'productos_bajos': [],
+        }
 
     logger.warning(
-        f'[stock_bajo] {len(productos_bajos)} producto(s) con stock < {umbral}.'
+        '[stock_bajo] %s producto(s) con stock inferior a %s.',
+        len(productos_bajos),
+        umbral
     )
 
-    # Enviar alerta por correo si hay administradores configurados
     if settings.ADMINS:
         _enviar_alerta_stock(productos_bajos, umbral)
 
     return {
-        'umbral':          umbral,
-        'total':           len(productos_bajos),
+        'umbral': umbral,
+        'total': len(productos_bajos),
         'productos_bajos': productos_bajos,
     }
 
 
-def _enviar_alerta_stock(productos_bajos: list, umbral: int) -> None:
-    """Envía el correo de alerta de stock al primer administrador.
+def _enviar_alerta_stock(
+    productos_bajos: list,
+    umbral: int
+) -> None:
+    """Envía el correo de alerta de stock al primer administrador."""
 
-    Args:
-        productos_bajos: lista de dicts con nombre, stock y categoría.
-        umbral:          umbral mínimo configurado.
-    """
-    from configuracion.models import ConfiguracionERP   # import local
+    from configuracion.models import ConfiguracionERP
 
     config = ConfiguracionERP.get_instance()
-    fecha  = timezone.now().strftime('%d/%m/%Y %H:%M')
+    fecha = timezone.now().strftime('%d/%m/%Y %H:%M')
 
     url_admin = (
-        'https://erp-django-utec.onrender.com/admin/productos/producto/'
+        'https://erp-django-njx2.onrender.com'
+        '/admin/productos/producto/'
     )
 
     contexto = {
-        'productos_bajos':  productos_bajos,
-        'total_productos':  len(productos_bajos),
-        'umbral':           umbral,
-        'fecha':            fecha,
-        'url_admin':        url_admin,
-        'config':           config,
+        'productos_bajos': productos_bajos,
+        'total_productos': len(productos_bajos),
+        'umbral': umbral,
+        'fecha': fecha,
+        'url_admin': url_admin,
+        'config': config,
     }
 
-    asunto      = (
-        f'[ALERTA] {len(productos_bajos)} producto(s) con stock < {umbral}'
+    asunto = (
+        f'[ALERTA] {len(productos_bajos)} producto(s) '
+        f'con stock inferior a {umbral}'
     )
-    texto_plano = render_to_string('emails/alerta_stock.txt',  contexto)
-    html_body   = render_to_string('emails/alerta_stock.html', contexto)
+
+    texto_plano = render_to_string(
+        'emails/alerta_stock.txt',
+        contexto
+    )
+
+    html_body = render_to_string(
+        'emails/alerta_stock.html',
+        contexto
+    )
 
     admin_nombre, admin_correo = settings.ADMINS[0]
 
     mensaje = EmailMultiAlternatives(
-        subject    = asunto,
-        body       = texto_plano,
-        from_email = settings.DEFAULT_FROM_EMAIL,
-        to         = [admin_correo],
+        subject=asunto,
+        body=texto_plano,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[admin_correo],
     )
+
     mensaje.attach_alternative(html_body, 'text/html')
 
     try:
-        mensaje.send()
+        enviados = mensaje.send(fail_silently=False)
+
         logger.info(
-            f'[stock_bajo] Alerta enviada a {admin_correo}. '
-            f'{len(productos_bajos)} productos.'
+            '[stock_bajo] Resultado del envío: %s. '
+            'Destinatario: %s. Productos: %s.',
+            enviados,
+            admin_correo,
+            len(productos_bajos)
         )
-    except Exception as exc:
-        logger.error(f'[stock_bajo] Error al enviar alerta: {exc}')
+
+    except Exception:
+        logger.exception(
+            '[stock_bajo] Error al enviar la alerta al administrador.'
+        )

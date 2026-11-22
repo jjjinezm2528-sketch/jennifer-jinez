@@ -1,24 +1,26 @@
 
 # catalogo/webhook_views.py
-"""Endpoint de webhook para recibir eventos de Stripe — W15/W16.
+"""Endpoint de webhook para recibir eventos de Stripe.
 
-Verificación de seguridad:
-    Stripe firma cada evento con STRIPE_WEBHOOK_SECRET.
-    stripe.Webhook.construct_event() verifica la firma.
+W15/W16/W17.
 
 Eventos manejados:
-    payment_intent.succeeded
-        -> Pedido.estado = 'pagado'
-        -> Descontar stock de productos
-        -> Programar confirmación mediante Celery
+    payment_intent.succeeded:
+        - Confirma el pedido.
+        - Descuenta el inventario una sola vez.
+        - Envía directamente el correo de confirmación.
 
-    payment_intent.payment_failed
-        -> Pedido.estado = 'cancelado'
+    payment_intent.payment_failed:
+        - Cancela el pedido pendiente.
+
+El envío directo utiliza Django + SendGrid y no necesita
+un Celery Worker.
 """
 
 import logging
 
 import stripe
+
 from django.conf import settings
 from django.db import transaction
 from django.db.models import F
@@ -40,7 +42,7 @@ def stripe_webhook(request) -> HttpResponse:
     payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
 
-    # 1. Verificar firma de Stripe.
+    # 1. Verificar la firma del evento.
     try:
         event = stripe.Webhook.construct_event(
             payload=payload,
@@ -58,12 +60,13 @@ def stripe_webhook(request) -> HttpResponse:
         )
         return HttpResponse('Firma inválida.', status=400)
 
-    # Convertir StripeObject a diccionario nativo.
+    # 2. Convertir StripeObject a diccionario nativo.
     if hasattr(event, 'to_dict'):
         event = event.to_dict()
 
-    # 2. Procesar evento.
+    # 3. Procesar el evento.
     tipo = event['type']
+
     logger.info('Webhook recibido: %s', tipo)
 
     if tipo == 'payment_intent.succeeded':
@@ -83,9 +86,10 @@ def stripe_webhook(request) -> HttpResponse:
 # ---------------------------------------------------------------------
 
 def _manejar_pago_exitoso(payment_intent: dict) -> None:
-    """Confirma el pago, descuenta inventario y programa la tarea Celery.
+    """
+    Confirma el pago, descuenta inventario y envía la confirmación.
 
-    La confirmación se programa solamente cuando el pedido cambia
+    La confirmación se intenta únicamente cuando el pedido cambia
     por primera vez de pendiente a pagado.
     """
 
@@ -97,8 +101,7 @@ def _manejar_pago_exitoso(payment_intent: dict) -> None:
     try:
         with transaction.atomic():
 
-            # Bloquea la fila durante la transacción para evitar
-            # procesamientos simultáneos del mismo pedido.
+            # Bloquear la fila para evitar procesamientos simultáneos.
             pedido = (
                 Pedido.objects
                 .select_for_update()
@@ -107,40 +110,43 @@ def _manejar_pago_exitoso(payment_intent: dict) -> None:
 
             if pedido.estado != 'pagado':
 
-                # Confirmar pedido.
+                # Confirmar el pedido.
                 pedido.estado = 'pagado'
                 pedido.save(update_fields=['estado'])
 
                 logger.info(
                     'Pedido %s actualizado a pagado.',
-                    pedido.numero_pedido,
+                    pedido.numero_pedido
                 )
 
                 # Descontar inventario una sola vez.
                 _descontar_stock(pedido)
 
-                # Guardar el ID antes de registrar el callback.
                 pedido_pk = pedido.pk
+                numero_pedido = pedido.numero_pedido
 
-                # Programar el correo únicamente después de que
-                # la transacción de base de datos se haya confirmado.
+                # Ejecutar el envío después de confirmar la transacción.
                 def programar_confirmacion():
-                    from ventas.tasks import enviar_confirmacion_pedido
+                    from ventas.tasks import (
+                        enviar_confirmacion_pedido_directo
+                    )
 
                     try:
-                        enviar_confirmacion_pedido.delay(pedido_pk)
+                        resultado = (
+                            enviar_confirmacion_pedido_directo(pedido_pk)
+                        )
 
                         logger.info(
-                            'Tarea de confirmación programada para '
-                            'el pedido %s.',
-                            pedido.numero_pedido,
+                            'Resultado del correo para pedido %s: %s',
+                            numero_pedido,
+                            resultado,
                         )
 
                     except Exception:
                         logger.exception(
-                            'No se pudo programar la confirmación '
+                            'No se pudo enviar la confirmación '
                             'del pedido %s.',
-                            pedido.numero_pedido,
+                            numero_pedido,
                         )
 
                 transaction.on_commit(programar_confirmacion)
@@ -150,13 +156,13 @@ def _manejar_pago_exitoso(payment_intent: dict) -> None:
                     'Pedido %s ya estaba pagado. '
                     'Evento duplicado: no se repite el descuento '
                     'ni se programa otra confirmación.',
-                    pedido.numero_pedido,
+                    pedido.numero_pedido
                 )
 
     except Pedido.DoesNotExist:
         logger.error(
             'Webhook: Pedido %s no encontrado en la base de datos.',
-            pedido_id,
+            pedido_id
         )
 
 
@@ -174,7 +180,7 @@ def _manejar_pago_fallido(payment_intent: dict) -> None:
     except Pedido.DoesNotExist:
         logger.error(
             'Webhook: Pedido %s no encontrado en la base de datos.',
-            pedido_id,
+            pedido_id
         )
         return
 
@@ -184,7 +190,7 @@ def _manejar_pago_fallido(payment_intent: dict) -> None:
 
         logger.info(
             'Pedido %s cancelado por pago fallido.',
-            pedido.numero_pedido,
+            pedido.numero_pedido
         )
 
 
@@ -196,9 +202,8 @@ def _extraer_pedido_id(payment_intent: dict) -> int | None:
 
     if not pedido_id:
         logger.warning(
-            'Webhook: PaymentIntent sin pedido_id en metadata. '
-            'ID: %s',
-            payment_intent.get('id'),
+            'Webhook: PaymentIntent sin pedido_id en metadata. ID: %s',
+            payment_intent.get('id')
         )
         return None
 
@@ -208,7 +213,7 @@ def _extraer_pedido_id(payment_intent: dict) -> int | None:
     except (ValueError, TypeError):
         logger.error(
             'Webhook: pedido_id inválido: %r',
-            pedido_id,
+            pedido_id
         )
         return None
 
@@ -223,10 +228,11 @@ def _descontar_stock(pedido: Pedido) -> None:
 
         try:
             cantidad = int(item.get('cantidad', 0))
+
         except (ValueError, TypeError):
             logger.warning(
                 'Cantidad inválida en el snapshot del pedido %s.',
-                pedido.numero_pedido,
+                pedido.numero_pedido
             )
             continue
 
@@ -246,16 +252,14 @@ def _descontar_stock(pedido: Pedido) -> None:
 
         if filas_actualizadas:
             logger.info(
-                'Stock decrementado: Producto %s, '
-                '%s unidades.',
+                'Stock decrementado: Producto %s, %s unidades.',
                 producto_id,
-                cantidad,
+                cantidad
             )
 
         else:
             logger.warning(
-                'Producto %s: stock insuficiente para '
-                'descontar %s unidades.',
+                'Producto %s: stock insuficiente para descontar %s unidades.',
                 producto_id,
-                cantidad,
+                cantidad
             )
