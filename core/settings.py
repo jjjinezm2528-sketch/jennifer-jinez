@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
+    "anymail",
     "whitenoise.runserver_nostatic",
 
     # Apps del ERP
@@ -542,4 +543,41 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn-danger",
         "success": "btn-success",
     },
+}
+
+
+# =========================================================
+# CORREO ELECTRÓNICO — W17
+# =========================================================
+
+# Desarrollo: mostrar correos en la terminal.
+# Producción: SendGrid mediante django-anymail.
+
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.console.EmailBackend",
+)
+
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="ERP Django <noreply@erp-django.com>",
+)
+
+EMAIL_SUBJECT_PREFIX = "[ERP Django] "
+
+ADMINS = [
+    (
+        "Admin ERP",
+        env("ADMIN_EMAIL", default="admin@erp-django.com"),
+    ),
+]
+
+# Clave de SendGrid.
+SENDGRID_API_KEY = env(
+    "SENDGRID_API_KEY",
+    default="",
+)
+
+ANYMAIL = {
+    "SENDGRID_API_KEY": SENDGRID_API_KEY,
 }

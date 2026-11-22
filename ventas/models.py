@@ -157,7 +157,7 @@ class Pedido(models.Model):
         verbose_name='Total pagado',
     )
 
-    # Nuevo campo: copia de los artículos del carrito.
+    # Copia de los artículos del carrito.
     items_snapshot = models.JSONField(
         default=list,
         blank=True,
@@ -167,6 +167,13 @@ class Pedido(models.Model):
             'Estructura: [{"producto_id": 1, "nombre": "...", '
             '"cantidad": 2, "precio": "500.00"}]'
         )
+    )
+
+    # W17: control del envío del correo de confirmación.
+    correo_enviado = models.BooleanField(
+        default=False,
+        verbose_name='Correo de confirmación enviado',
+        help_text='True cuando se envió el correo de confirmación al cliente.'
     )
 
     class Meta:
