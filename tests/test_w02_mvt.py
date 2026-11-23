@@ -1,3 +1,4 @@
+
 """Suite de pruebas W02 — Patrón MVT: templates, vistas y estáticos.
 
 Ejecutar con:
@@ -15,10 +16,10 @@ class TemplatesRenderTest(TestCase):
     """Verifica que las vistas usan render() y los templates correctos."""
 
     def test_bienvenida_usa_template_correcto(self):
-        """La vista de inicio debe renderizar bienvenida.html."""
+        """La vista de inicio debe renderizar home.html."""
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'bienvenida.html')
+        self.assertTemplateUsed(response, 'home.html')
 
     def test_bienvenida_extiende_base(self):
         """La página de inicio debe extender base.html."""
@@ -62,15 +63,19 @@ class ContextoBienvenidaTest(TestCase):
     def test_contexto_contiene_modulos(self):
         """La vista de inicio debe pasar 'modulos' en el contexto."""
         response = self.client.get('/')
-        self.assertIn('modulos', response.context,
-                      "El contexto debe incluir la lista 'modulos'")
+        self.assertIn(
+            'modulos',
+            response.context,
+            "El contexto debe incluir la lista 'modulos'"
+        )
 
     def test_contexto_tiene_seis_modulos(self):
         """El contexto debe contener exactamente 6 módulos."""
         response = self.client.get('/')
         modulos = response.context.get('modulos', [])
         self.assertEqual(
-            len(modulos), 6,
+            len(modulos),
+            6,
             f"Se esperaban 6 módulos, se encontraron {len(modulos)}"
         )
 
@@ -86,8 +91,10 @@ class StaticFilesConfigTest(TestCase):
     def test_static_root_configurado(self):
         """STATIC_ROOT debe estar definido."""
         from django.conf import settings
-        self.assertTrue(bool(settings.STATIC_ROOT),
-                        "STATIC_ROOT no está configurado")
+        self.assertTrue(
+            bool(settings.STATIC_ROOT),
+            "STATIC_ROOT no está configurado"
+        )
 
     def test_whitenoise_en_middleware(self):
         """WhiteNoise debe estar en MIDDLEWARE."""
@@ -102,7 +109,14 @@ class StaticFilesConfigTest(TestCase):
         """WhiteNoise debe ir DESPUÉS de SecurityMiddleware."""
         from django.conf import settings
         m = settings.MIDDLEWARE
-        idx_sec  = m.index('django.middleware.security.SecurityMiddleware')
-        idx_wn   = m.index('whitenoise.middleware.WhiteNoiseMiddleware')
-        self.assertLess(idx_sec, idx_wn,
-                        "SecurityMiddleware debe ir ANTES que WhiteNoise")
+        idx_sec = m.index(
+            'django.middleware.security.SecurityMiddleware'
+        )
+        idx_wn = m.index(
+            'whitenoise.middleware.WhiteNoiseMiddleware'
+        )
+        self.assertLess(
+            idx_sec,
+            idx_wn,
+            "SecurityMiddleware debe ir ANTES que WhiteNoise"
+        )

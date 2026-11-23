@@ -1,7 +1,7 @@
 
 # docker-compose.yml
 # ERP Django con WeasyPrint, PostgreSQL, Redis y Celery
-# Entorno local tipo producción — W16
+# Entorno local tipo producción — W18
 
 services:
 
@@ -82,14 +82,14 @@ services:
       retries: 3
 
   # =========================================================
-  # CELERY WORKER — W16
+  # CELERY WORKER — W16 / W18
   # =========================================================
   celery_worker:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    command: celery -A core worker -l info -Q default
+    command: celery -A core worker -l info -Q default,erp_django
     volumes:
       - .:/app
     depends_on:
@@ -108,8 +108,6 @@ services:
       DATABASE_SSL_REQUIRE: "False"
       REDIS_URL: redis://redis:6379/0
       REDIS_CACHE_URL: redis://redis:6379/1
-
-
 
   # =========================================================
   # CELERY BEAT — PROGRAMADOR DE TAREAS — W18
@@ -138,7 +136,6 @@ services:
       DATABASE_SSL_REQUIRE: "False"
       REDIS_URL: redis://redis:6379/0
       REDIS_CACHE_URL: redis://redis:6379/1
-
 
   # =========================================================
   # FLOWER — MONITOREO DE CELERY

@@ -1,3 +1,4 @@
+
 """Tareas de la aplicación ventas.
 
 W17: envío de correos mediante django-anymail + SendGrid.
@@ -392,11 +393,24 @@ def reporte_ventas_diario(self) -> dict:
             config
         )
 
+    # 4. Normalizar los datos para que sean compatibles con JSON.
+    # Se conserva top_productos original para generar el correo.
+    top_productos_resultado = [
+        {
+            'nombre': producto['nombre'],
+            'unidades': producto['unidades'],
+            'ingreso': str(
+                producto['ingreso'] or Decimal('0.00')
+            ),
+        }
+        for producto in top_productos
+    ]
+
     return {
         'fecha': str(hoy),
         'total_pedidos': total_pedidos,
         'total_facturado': str(total_facturado),
-        'top_productos': top_productos,
+        'top_productos': top_productos_resultado,
     }
 
 
