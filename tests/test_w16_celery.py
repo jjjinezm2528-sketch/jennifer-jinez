@@ -219,8 +219,9 @@ class TareaInvocadaDesdeVistaTest(TestCase):
             session,
         )
 
-    def test_webhook_succeeded_programa_celery_una_sola_vez(self):
-        """El webhook programa Celery una vez y evita duplicados."""
+    
+    def test_webhook_succeeded_envia_correo_directo_una_sola_vez(self):
+        """El webhook envía la confirmación directa una sola vez."""
 
         evento = {
             'type': 'payment_intent.succeeded',
@@ -239,12 +240,16 @@ class TareaInvocadaDesdeVistaTest(TestCase):
                 'catalogo.webhook_views.stripe.Webhook.construct_event'
             ) as mock_event,
             patch(
-                'ventas.tasks.enviar_confirmacion_pedido.delay'
-            ) as mock_delay,
+                'ventas.tasks.enviar_confirmacion_pedido_directo'
+            ) as mock_correo,
         ):
             mock_event.return_value = evento
+            mock_correo.return_value = {
+                'estado': 'ok',
+                'pedido_id': self.pedido.pk,
+            }
 
-            # Primer evento: confirma el pedido y programa Celery.
+            # Primer evento: confirma el pedido y envía el correo.
             with self.captureOnCommitCallbacks(execute=True):
                 response = self.client.post(
                     reverse('catalogo:webhook'),
@@ -257,16 +262,11 @@ class TareaInvocadaDesdeVistaTest(TestCase):
 
             self.pedido.refresh_from_db()
 
-            self.assertEqual(
-                self.pedido.estado,
-                'pagado',
-            )
+            self.assertEqual(self.pedido.estado, 'pagado')
 
-            mock_delay.assert_called_once_with(
-                self.pedido.pk
-            )
+            mock_correo.assert_called_once_with(self.pedido.pk)
 
-            # Segundo evento: no debe programar otra tarea.
+            # Segundo evento: no debe repetir el envío.
             with self.captureOnCommitCallbacks(execute=True):
                 response = self.client.post(
                     reverse('catalogo:webhook'),
@@ -277,6 +277,4 @@ class TareaInvocadaDesdeVistaTest(TestCase):
 
             self.assertEqual(response.status_code, 200)
 
-            mock_delay.assert_called_once_with(
-                self.pedido.pk
-            )
+            mock_correo.assert_called_once_with(self.pedido.pk)
