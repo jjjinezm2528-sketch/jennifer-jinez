@@ -1,218 +1,265 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
     <title>Confirmación de pedido {{ pedido.numero_pedido }}</title>
-    <style>
-        /* CSS inline — mayor compatibilidad con clientes de correo */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 15px;
-            background: #F5F7FA;
-            color: #1A1A2E;
-        }
-        .wrapper {
-            max-width: 600px;
-            margin: 24px auto;
-            background: #FFFFFF;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 16px rgba(10,35,66,.1);
-        }
-        /* Encabezado */
-        .header {
-            background: #0A2342;
-            padding: 28px 32px;
-            border-bottom: 4px solid #B8860B;
-        }
-        .header-title {
-            color: #D4AF37;
-            font-size: 22px;
-            font-weight: bold;
-            letter-spacing: .03em;
-        }
-        .header-sub {
-            color: rgba(255,255,255,.7);
-            font-size: 13px;
-            margin-top: 4px;
-        }
-        /* Cuerpo */
-        .body { padding: 28px 32px; }
-        .greeting {
-            font-size: 17px;
-            margin-bottom: 16px;
-            color: #0A2342;
-        }
-        /* Caja del pedido */
-        .pedido-box {
-            background: #E8F0FB;
-            border-left: 5px solid #0A2342;
-            border-radius: 0 8px 8px 0;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
-        .pedido-num {
-            font-size: 20px;
-            font-weight: bold;
-            color: #0A2342;
-        }
-        .pedido-total {
-            font-size: 18px;
-            font-weight: bold;
-            color: #B8860B;
-            margin-top: 4px;
-        }
-        /* Tabla de productos */
-        .productos-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        .productos-table th {
-            background: #0A2342;
-            color: #FFFFFF;
-            padding: 10px 14px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            text-align: left;
-        }
-        .productos-table th.num { text-align: right; }
-        .productos-table td {
-            padding: 9px 14px;
-            border-bottom: 1px solid #E8F0FB;
-            font-size: 14px;
-        }
-        .productos-table td.num { text-align: right; }
-        .productos-table tr:last-child td { border-bottom: none; }
-        .total-row td {
-            background: #FDF8E8;
-            border-top: 2px solid #B8860B;
-            font-weight: bold;
-            font-size: 15px;
-            padding: 12px 14px;
-        }
-        .total-valor { color: #B8860B; text-align: right; }
-        /* CTA */
-        .cta-section { text-align: center; margin: 24px 0; }
-        .cta-btn {
-            display: inline-block;
-            background: #B8860B;
-            color: #FFFFFF;
-            padding: 12px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 15px;
-        }
-        /* Pie */
-        .footer {
-            background: #F5F7FA;
-            border-top: 1px solid #C8D8EC;
-            padding: 16px 32px;
-            font-size: 12px;
-            color: #5A6A7E;
-            text-align: center;
-        }
-    </style>
 </head>
-<body>
-<div class="wrapper">
 
-    <!-- ENCABEZADO -->
-    <div class="header">
-        <div class="header-title">✅ ¡Pago confirmado!</div>
-        <div class="header-sub">{{ config.nombre_empresa }}</div>
-    </div>
+<body style="margin:0;padding:0;background-color:#101D3B;font-family:Arial,Helvetica,sans-serif;color:#17264B;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background-color:#101D3B;padding:25px 8px;">
+<tr>
+<td align="center">
+
+<!-- CONTENEDOR PRINCIPAL -->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+       style="width:100%;max-width:600px;background-color:#FFF8E8;border-radius:14px;overflow:hidden;">
+
+    <!-- ENCABEZADO ESTRELLADO -->
+    <tr>
+        <td align="center"
+            style="background-color:#101D3B;padding:35px 20px 30px;border-bottom:4px solid #E9B83F;">
+
+            <div style="font-size:23px;line-height:1.5;color:#F5C65A;letter-spacing:3px;">
+                ✦ &nbsp; ✧ &nbsp; ★ &nbsp; ✧ &nbsp; ✦
+            </div>
+
+            <div style="font-size:30px;font-weight:bold;color:#FFFFFF;letter-spacing:2px;margin-top:12px;">
+                ERP <span style="color:#F5C65A;">DJANGO</span>
+            </div>
+
+            <div style="font-size:12px;letter-spacing:4px;color:#D9D8E8;margin-top:7px;">
+                UTEC CELAYA
+            </div>
+
+            <div style="margin-top:28px;font-size:30px;font-weight:bold;color:#FFF8E8;">
+                ¡Pago confirmado!
+            </div>
+
+            <div style="font-size:14px;color:#E4D9C6;margin-top:10px;">
+                Tu compra se ha registrado correctamente.
+            </div>
+
+            <div style="font-size:20px;color:#F5C65A;margin-top:18px;">
+                ✦ &nbsp; ★ &nbsp; ✧ &nbsp; ★ &nbsp; ✦
+            </div>
+
+        </td>
+    </tr>
 
     <!-- CUERPO -->
-    <div class="body">
-        <p class="greeting">
-            Hola, <strong>{{ pedido.cliente.nombre }}</strong>:
-        </p>
+    <tr>
+        <td style="padding:30px 25px;">
 
-        <p style="color:#5A6A7E;margin-bottom:16px;">
-            Gracias por tu compra. Tu pedido ha sido confirmado
-            y está siendo procesado.
-        </p>
+            <!-- SALUDO -->
+            <p style="font-size:23px;font-weight:bold;color:#172B59;margin:0 0 14px;">
+                Hola, {{ pedido.cliente.nombre }}.
+            </p>
 
-        <!-- Número y total del pedido -->
-        <div class="pedido-box">
-            <div class="pedido-num">
-                Pedido {{ pedido.numero_pedido }}
-            </div>
+            <p style="font-size:14px;line-height:1.8;color:#615B59;margin:0 0 24px;">
+                Gracias por tu compra. Estamos muy contentos de atenderte.
+                Tu pedido ha sido confirmado y está siendo procesado.
+            </p>
 
-            <div class="pedido-total">
-                Total pagado: ${{ pedido.total_pagado }}
-            </div>
+            <!-- TARJETA DE PEDIDO -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                   border="0" style="background-color:#172B59;border-radius:12px;">
 
-            <div style="color:#5A6A7E;font-size:13px;margin-top:6px;">
-                Fecha: {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}
-            </div>
-        </div>
-
-        <!-- Tabla de productos del snapshot -->
-        {% if items %}
-        <table class="productos-table">
-            <thead>
                 <tr>
-                    <th>Producto</th>
-                    <th class="num">Precio</th>
-                    <th class="num">Cant.</th>
-                    <th class="num">Subtotal</th>
-                </tr>
-            </thead>
+                    <td style="padding:22px;">
 
-            <tbody>
-                {% for item in items %}
-                <tr>
-                    <td>{{ item.nombre }}</td>
-                    <td class="num">${{ item.precio }}</td>
-                    <td class="num">{{ item.cantidad }}</td>
-                    <td class="num">${{ item.subtotal }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                        <div style="font-size:11px;color:#E9C56D;letter-spacing:2px;font-weight:bold;">
+                            ✦ INFORMACIÓN DE TU PEDIDO
+                        </div>
 
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="3">Total:</td>
-                    <td class="total-valor">
-                        ${{ pedido.total_pagado }}
+                        <div style="font-size:23px;font-weight:bold;color:#FFFFFF;margin-top:12px;">
+                            {{ pedido.numero_pedido }}
+                        </div>
+
+                        <div style="font-size:13px;color:#D8DDED;margin-top:8px;">
+                            Fecha: {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}
+                        </div>
+
+                        <div style="border-top:1px solid #52648A;margin-top:17px;padding-top:17px;">
+
+                            <div style="font-size:11px;color:#E9C56D;letter-spacing:2px;">
+                                TOTAL PAGADO
+                            </div>
+
+                            <div style="font-size:30px;font-weight:bold;color:#F5C65A;margin-top:7px;">
+                                ${{ pedido.total_pagado }}
+                            </div>
+
+                            <div style="font-size:13px;color:#D8DDED;margin-top:8px;">
+                                Estado del pago:
+                                <span style="color:#8CE0B1;font-weight:bold;">
+                                    ✓ Pagado
+                                </span>
+                            </div>
+
+                        </div>
+
                     </td>
                 </tr>
-            </tfoot>
-        </table>
-        {% endif %}
+            </table>
 
-        <!-- Botón CTA -->
-        <div class="cta-section">
-            <a href="{{ url_pedido }}" class="cta-btn">
-                Ver detalle del pedido
-            </a>
-        </div>
+            <!-- RESUMEN DE COMPRA -->
+            {% if items %}
 
-        <p style="color:#5A6A7E;font-size:13px;margin-top:8px;">
-            Si tienes preguntas, responde a este correo.<br>
-            Equipo de {{ config.nombre_empresa }}
-        </p>
-    </div>
+            <h2 style="font-size:20px;color:#172B59;margin:30px 0 15px;">
+                ✦ Resumen de tu compra
+            </h2>
 
-    <!-- PIE -->
-    <div class="footer">
-        <p>
-            {{ config.nombre_empresa }}
-            {% if config.rfc %}· RFC: {{ config.rfc }}{% endif %}
-        </p>
+            <table role="presentation" width="100%" cellpadding="0"
+                   cellspacing="0" border="0"
+                   style="width:100%;border-collapse:collapse;">
 
-        <p style="margin-top:4px;">
-            Este correo fue generado automáticamente.
-            No responder directamente.
-        </p>
-    </div>
+                <thead>
+                    <tr style="background-color:#172B59;">
 
-</div>
+                        <th align="left" style="padding:12px 7px;color:#FFFFFF;font-size:11px;">
+                            PRODUCTO
+                        </th>
+
+                        <th align="right" style="padding:12px 5px;color:#FFFFFF;font-size:11px;">
+                            PRECIO
+                        </th>
+
+                        <th align="center" style="padding:12px 5px;color:#FFFFFF;font-size:11px;">
+                            CANT.
+                        </th>
+
+                        <th align="right" style="padding:12px 7px;color:#FFFFFF;font-size:11px;">
+                            SUBTOTAL
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in items %}
+
+                    <tr style="background-color:#FFFCF4;">
+
+                        <td style="padding:13px 7px;border-bottom:1px solid #E8DFC9;font-size:12px;color:#343A51;">
+                            {{ item.nombre }}
+                        </td>
+
+                        <td align="right" style="padding:13px 5px;border-bottom:1px solid #E8DFC9;font-size:12px;color:#343A51;">
+                            ${{ item.precio }}
+                        </td>
+
+                        <td align="center" style="padding:13px 5px;border-bottom:1px solid #E8DFC9;font-size:12px;color:#343A51;">
+                            {{ item.cantidad }}
+                        </td>
+
+                        <td align="right" style="padding:13px 7px;border-bottom:1px solid #E8DFC9;font-size:12px;font-weight:bold;color:#172B59;">
+                            ${{ item.subtotal }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+                <tfoot>
+                    <tr style="background-color:#F9E9BB;">
+
+                        <td colspan="3" style="padding:15px 8px;font-size:14px;font-weight:bold;color:#172B59;">
+                            TOTAL
+                        </td>
+
+                        <td align="right" style="padding:15px 7px;font-size:16px;font-weight:bold;color:#805615;">
+                            ${{ pedido.total_pagado }}
+                        </td>
+
+                    </tr>
+                </tfoot>
+
+            </table>
+
+            {% endif %}
+
+            <!-- BOTÓN -->
+            <table role="presentation" width="100%" cellpadding="0"
+                   cellspacing="0" border="0" style="margin-top:30px;">
+
+                <tr>
+                    <td align="center">
+
+                        <a href="{{ url_pedido }}"
+                           style="display:inline-block;background-color:#54258A;color:#FFFFFF;text-decoration:none;font-size:14px;font-weight:bold;padding:15px 28px;border-radius:9px;">
+                            VER DETALLE DE MI PEDIDO &nbsp; →
+                        </a>
+
+                    </td>
+                </tr>
+
+            </table>
+
+            <!-- MENSAJE FINAL -->
+            <div style="margin-top:28px;padding:19px;background-color:#F5EEDC;border-left:4px solid #D4AF37;border-radius:5px;">
+
+                <p style="font-size:13px;line-height:1.7;color:#514B51;margin:0;">
+                    Si tienes alguna pregunta sobre tu compra,
+                    puedes comunicarte con nuestro equipo.
+                </p>
+
+            </div>
+
+            <p style="text-align:center;font-size:19px;font-weight:bold;color:#172B59;margin:27px 0 5px;">
+                ¡Gracias por confiar en nosotros!
+            </p>
+
+            <p style="text-align:center;font-size:17px;color:#D4A638;margin:10px 0;">
+                ✦ &nbsp; ★ &nbsp; ✧ &nbsp; ★ &nbsp; ✦
+            </p>
+
+        </td>
+    </tr>
+
+    <!-- PIE ESTRELLADO -->
+    <tr>
+        <td align="center"
+            style="background-color:#101D3B;padding:28px 20px;border-top:4px solid #D4AF37;">
+
+            <div style="font-size:19px;font-weight:bold;color:#FFFFFF;">
+                {{ config.nombre_empresa }}
+            </div>
+
+            {% if config.rfc %}
+            <div style="font-size:11px;color:#D8DDED;margin-top:7px;">
+                RFC: {{ config.rfc }}
+            </div>
+            {% endif %}
+
+            <div style="font-size:18px;color:#F5C65A;margin:17px 0;">
+                ✦ &nbsp; ★ &nbsp; ✧ &nbsp; ★ &nbsp; ✦
+            </div>
+
+            <div style="font-size:12px;color:#D8DDED;">
+                ERP Django · UTEC Celaya
+            </div>
+
+            <div style="font-size:11px;color:#AEBBD4;margin-top:10px;line-height:1.6;">
+                Este correo fue generado automáticamente.<br>
+                No responder directamente.
+            </div>
+
+        </td>
+    </tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
 </body>
 </html>
