@@ -132,6 +132,7 @@
         <p class="greeting">
             Hola, <strong>{{ pedido.cliente.nombre }}</strong>:
         </p>
+
         <p style="color:#5A6A7E;margin-bottom:16px;">
             Gracias por tu compra. Tu pedido ha sido confirmado
             y está siendo procesado.
@@ -142,9 +143,11 @@
             <div class="pedido-num">
                 Pedido {{ pedido.numero_pedido }}
             </div>
+
             <div class="pedido-total">
                 Total pagado: ${{ pedido.total_pagado }}
             </div>
+
             <div style="color:#5A6A7E;font-size:13px;margin-top:6px;">
                 Fecha: {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}
             </div>
@@ -161,22 +164,24 @@
                     <th class="num">Subtotal</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for item in items %}
                 <tr>
                     <td>{{ item.nombre }}</td>
                     <td class="num">${{ item.precio }}</td>
                     <td class="num">{{ item.cantidad }}</td>
-                    <td class="num">
-                        ${% widthratio item.cantidad 1 item.precio %}
-                    </td>
+                    <td class="num">${{ item.subtotal }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
+
             <tfoot>
                 <tr class="total-row">
                     <td colspan="3">Total:</td>
-                    <td class="total-valor">${{ pedido.total_pagado }}</td>
+                    <td class="total-valor">
+                        ${{ pedido.total_pagado }}
+                    </td>
                 </tr>
             </tfoot>
         </table>
@@ -197,10 +202,14 @@
 
     <!-- PIE -->
     <div class="footer">
-        <p>{{ config.nombre_empresa }}
-           {% if config.rfc %}· RFC: {{ config.rfc }}{% endif %}</p>
+        <p>
+            {{ config.nombre_empresa }}
+            {% if config.rfc %}· RFC: {{ config.rfc }}{% endif %}
+        </p>
+
         <p style="margin-top:4px;">
-            Este correo fue generado automáticamente. No responder directamente.
+            Este correo fue generado automáticamente.
+            No responder directamente.
         </p>
     </div>
 
