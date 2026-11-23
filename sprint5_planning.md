@@ -1,15 +1,14 @@
-## Sprint Backlog — actualización W16
+## Sprint 5 — Estado final W18
 
-| Tarea | Estado |
-|---|---|
-| pip install celery redis flower | ✅ W16 |
-| core/celery.py + core/__init__.py | ✅ W16 |
-| CELERY_* en settings.py | ✅ W16 |
-| docker-compose.yml con worker + flower | ✅ W16 |
-| ventas/tasks.py (2 tareas placeholder) | ✅ W16 |
-| pago_exitoso: .delay() al vaciar carrito | ✅ W16 |
-| webhook: .delay() al confirmar pago | ✅ W16 |
-| Worker corriendo + Flower en :5555 | ✅ W16 |
-| SendGrid correo transaccional real | ⏳ W17 |
-| Alerta de stock bajo por correo | ⏳ W17 |
-| Celery Beat + tareas programadas | ⏳ W18 |
+| HU | Estado | Pts |
+|---|---|---|
+| HU-E6-01 a HU-E6-06 | ✅ Completadas | 18/18 |
+
+## Hito M6 — ALCANZADO ✅
+- Worker: celery -A core worker → tareas procesadas
+- Beat: celery -A core beat → schedule activo
+- Correo: enviar_confirmacion_pedido → enviado post-pago
+- Alerta: verificar_stock_bajo → correo al admin
+- Reporte: crontab(8,0) → 8:00 AM diario
+- Tests: Ran 171 tests → OK
+- Fecha: ___/___/_____
