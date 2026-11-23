@@ -8,51 +8,23 @@ from django.shortcuts import render
 from django.urls import reverse
 
 
+from django.shortcuts import render
+from django.urls import reverse
+
+
 def bienvenida(request):
-    """Página de inicio del ERP con tarjetas de módulos.
-
-    Context:
-        modulos (list): Lista de dicts con icono, nombre, url y descripcion.
-
-    Returns:
-        HttpResponse con template bienvenida.html.
-    """
     modulos = [
-        {
-            'nombre': 'Productos',
-            'icono': '📦',
-            'url': reverse('productos:lista'),
-            'descripcion': 'Inventario, precios y stock',
-        },
-        {
-            'nombre': 'Clientes',
-            'icono': '👥',
-            'url': reverse('clientes:lista'),
-            'descripcion': 'Cartera y gestión de clientes',
-        },
-        {
-            'nombre': 'Proveedores',
-            'icono': '🏭',
-            'url': reverse('proveedores:lista'),
-            'descripcion': 'Red de proveedores',
-        },
-        {
-            'nombre': 'Ventas',
-            'icono': '💰',
-            'url': reverse('ventas:lista'),
-            'descripcion': 'Pedidos, facturas y cobros',
-        },
-        {
-            'nombre': 'Reportes',
-            'icono': '📊',
-            'url': reverse('reportes:inicio'),
-            'descripcion': 'Dashboard y analítica',
-        },
-        {
-            'nombre': 'Admin',
-            'icono': '⚙️',
-            'url': '/admin/',
-            'descripcion': 'Panel de administración Django',
-        },
+        {"clave": "productos",   "nombre": "Productos",   "icono": "📦",
+         "descripcion": "Inventario, precios y stock",    "url": reverse("productos:lista")},
+        {"clave": "ventas",      "nombre": "Ventas",      "icono": "💰",
+         "descripcion": "Pedidos, facturas y cobros",      "url": reverse("ventas:lista")},
+        {"clave": "proveedores", "nombre": "Proveedores", "icono": "🏭",
+         "descripcion": "Red de proveedores",              "url": reverse("proveedores:lista")},
+        {"clave": "clientes",    "nombre": "Clientes",    "icono": "👥",
+         "descripcion": "Cartera y su historial",          "url": reverse("clientes:lista")},
+        {"clave": "reportes",    "nombre": "Reportes",    "icono": "📊",
+         "descripcion": "Indicadores y gráficas",          "url": reverse("reportes:inicio")},
+        {"clave": "tienda",      "nombre": "Tienda",      "icono": "🛒",
+         "descripcion": "Catálogo y pedidos en línea",     "url": reverse("catalogo:catalogo")},
     ]
-    return render(request, 'bienvenida.html', {'modulos': modulos})
+    return render(request, "home.html", {"modulos": modulos})

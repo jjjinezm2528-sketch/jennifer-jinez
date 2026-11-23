@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inicio | ERP Django{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/noche.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- ===== FONDO: La noche estrellada animada ===== -->
+<div class="nt-scene" aria-hidden="true">
+  <div class="nt-art" id="nt-art"><div class="nt-base nt-pic"></div><div class="nt-cy nt-pic"></div></div>
+  <canvas id="nt-cv"></canvas>
+  <div class="nt-veil"></div><div class="nt-grain"></div>
+  <div class="nt-moon"><svg viewBox="-100 -100 200 200"><defs><radialGradient id="ntg"><stop offset="0" stop-color="#ffe27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffe27a" stop-opacity="0"/></radialGradient><mask id="ntm"><rect x="-100" y="-100" width="200" height="200" fill="#fff"/><circle cx="26" cy="-18" r="50" fill="#000"/></mask></defs><circle r="100" fill="url(#ntg)"/><g class="nt-ring" fill="none" stroke="#ffe48a" opacity=".75"><circle r="70" stroke-width="3" stroke-dasharray="30 14"/><circle r="84" stroke-width="2" stroke-dasharray="14 18" opacity=".7"/></g><circle r="54" fill="#f8dd63" mask="url(#ntm)"/></svg></div>
+</div>
+
+<!-- ===== CONTENIDO ===== -->
+<div class="vg-home">
+  <section class="hero">
+    <h1>ERP Django</h1>
+    <p>Sistema de gestión empresarial · UTEC Celaya</p>
+    <div class="badges">
+      <span>Django 4.2 LTS</span>
+      <span>Python 3.11</span>
+      <span>Fable 5 AzulERP</span>
+    </div>
+  </section>
+
+  <nav class="nt-gallery" aria-label="Módulos">
+    {% for m in modulos %}
+    {% with k=m.clave|default:m.nombre|slugify %}
+    <a class="nt-card k-{{ k }}" style="--d:{{ forloop.counter0 }};--r:{% cycle '-1.2deg' '.7deg' '1.1deg' '.8deg' '-.9deg' '-.4deg' %}" href="{{ m.url }}">
+      <div class="nt-fr">
+        <div class="nt-cv">
+          <span class="nt-ic">{{ m.icono }}</span>
+          <h2>{{ m.nombre }}</h2>
+          <p>{{ m.descripcion }}</p>
+          {% if m.dato %}<div class="nt-pl">{{ m.dato }}</div>{% endif %}
+          <span class="nt-open">Abrir</span>
+        </div>
+      </div>
+    </a>
+    {% endwith %}
+    {% empty %}
+    <p class="hero">No hay módulos disponibles para mostrar.</p>
+    {% endfor %}
+  </nav>
+</div>
+<button class="nt-pause" id="nt-pause" type="button" aria-label="Pausar o reanudar animaciones" title="Pausar / reanudar animaciones">✺</button>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/noche.js' %}" defer></script>
+{% endblock %}
