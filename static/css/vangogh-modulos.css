@@ -1,0 +1,236 @@
+/* vangogh-modulos.css — diseño de los módulos del ERP, a juego con la portada.
+   Todo va con prefijo vgm (body.vgm) para no chocar con la portada (body.vg), Bootstrap ni base.html.
+   Cada módulo toma el color de su "óleo" de la portada: body.vgm-productos, -ventas, etc. */
+
+/* ---------- Variables base (noche) ---------- */
+body.vgm{
+  --paper:#f7eed2;--paper2:#ecdfb8;--ink:#2a1f0c;--ink2:#6b5a30;
+  --gold:#f2c230;--gold-d:#a97c12;--cream:#fbf3d4;
+  --a:#1d3d9c;--b:#3a68d0;--c:#7fa6e8;--deep:#0a1642;--link:#1d3d9c;
+  --dl:#cfe8fb;--dm:#8cc4f5;--dd:#3f86d6;
+  --bg1:var(--b);--bg2:var(--a);--bg3:var(--deep);
+  --txt:var(--cream);--txt2:#9bbcf0;
+  --giro:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' fill='none' stroke='rgba(246,213,74,.55)' stroke-width='3' stroke-linecap='round' stroke-dasharray='14 9'><path d='M200 200a10 10 0 0 1 20 0a20 20 0 0 1-40 0a30 30 0 0 1 60 0a40 40 0 0 1-80 0a50 50 0 0 1 100 0a60 60 0 0 1-120 0a70 70 0 0 1 140 0a80 80 0 0 1-160 0a90 90 0 0 1 180 0'/></svg>");
+  color:var(--txt);
+  background:radial-gradient(ellipse at 30% 0,var(--bg1) 0,var(--bg2) 42%,var(--bg3) 100%) fixed;
+  min-height:100vh;
+}
+
+/* ---------- Un color por módulo (los mismos de las pinturas de la portada) ---------- */
+body.vgm-productos{--a:#1d3d9c;--b:#3a68d0;--c:#7fa6e8;--deep:#0a1642;--link:#1d3d9c;--dl:#cfe8fb;--dm:#8cc4f5;--dd:#3f86d6}
+body.vgm-ventas{--a:#b87a0e;--b:#e0a81c;--c:#ffe48a;--deep:#2b1a02;--link:#8a5a06;--dl:#fff1b8;--dm:#f7d060;--dd:#d9a020}
+body.vgm-proveedores{--a:#8f3a17;--b:#c4592a;--c:#e68a45;--deep:#2a0e05;--link:#8f3a17;--dl:#ffe0b8;--dm:#f0a066;--dd:#c4592a}
+body.vgm-clientes{--a:#1b5a36;--b:#3f8f4a;--c:#8dbf5a;--deep:#06180f;--link:#1b5a36;--dl:#e6f2c0;--dm:#a7d17a;--dd:#4f9a55}
+body.vgm-reportes{--a:#3b2a8a;--b:#6a4fc0;--c:#9b86e0;--deep:#120a2e;--link:#3b2a8a;--dl:#e6defa;--dm:#b4a2ec;--dd:#6a4fc0}
+body.vgm-tienda{--a:#1c7a8a;--b:#4fb0b8;--c:#9fd8d4;--deep:#062a33;--link:#1c6a78;--dl:#dff4f2;--dm:#8fd0d0;--dd:#3a9aa6}
+
+/* ---------- Modo claro: "Campo de trigo" ---------- */
+body.vgm.vgm-claro{
+  --bg1:var(--dl);--bg2:var(--dm);--bg3:var(--dd);--txt:#2a1f0c;--txt2:#5d4a22;
+  --giro:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' fill='none' stroke='rgba(255,150,30,.6)' stroke-width='3' stroke-linecap='round' stroke-dasharray='14 9'><path d='M200 200a10 10 0 0 1 20 0a20 20 0 0 1-40 0a30 30 0 0 1 60 0a40 40 0 0 1-80 0a50 50 0 0 1 100 0a60 60 0 0 1-120 0a70 70 0 0 1 140 0a80 80 0 0 1-160 0a90 90 0 0 1 180 0'/></svg>");
+}
+
+/* ---------- Capas decorativas: espiral de fondo y grano de lienzo ---------- */
+body.vgm::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;
+  background:var(--giro) no-repeat 97% 7%/340px,var(--giro) no-repeat 1% 97%/240px}
+body.vgm::after{content:"";position:fixed;inset:0;z-index:50;pointer-events:none;
+  background-image:var(--grano);opacity:.2;mix-blend-mode:overlay}
+
+/* ---------- Barra superior y pie ---------- */
+body.vgm .erp-navbar{background:rgba(6,12,38,.92);border-bottom:2px solid var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.5)}
+body.vgm .erp-brand{color:var(--gold) !important}
+body.vgm .erp-nav-links{position:relative}
+body.vgm .erp-nav-link{position:relative;z-index:1;color:var(--cream) !important;background:transparent}
+body.vgm .erp-nav-link:hover,body.vgm .erp-nav-link.active{background:transparent;color:#fff !important}
+body.vgm .erp-nav-link.active{font-weight:700}
+body.vgm .theme-toggle{background:var(--gold);color:#0a1642}
+body.vgm .erp-footer{background:rgba(6,12,38,.92);border-top:2px solid var(--gold)}
+body.vgm .erp-main{padding:2.5rem 0 5rem}
+
+body.vgm-claro .erp-navbar{background:rgba(255,246,214,.94);border-bottom-color:#b8861c;box-shadow:0 4px 14px rgba(90,60,10,.3)}
+body.vgm-claro .erp-brand{color:#7a4e0a !important}
+body.vgm-claro .erp-nav-link{color:#3a2703 !important}
+body.vgm-claro .erp-nav-link:hover,body.vgm-claro .erp-nav-link.active{color:#000 !important}
+body.vgm-claro .theme-toggle{background:#b8861c;color:#fff8dc}
+body.vgm-claro .erp-footer{background:rgba(255,246,214,.94);border-top-color:#b8861c;color:#3a2703}
+
+/* Luz deslizante que descansa sobre el módulo actual */
+.vgm-luz{position:absolute;left:0;top:0;width:0;height:0;border-radius:999px;pointer-events:none;opacity:0;
+  border:2px solid var(--luz,#f2c230);background:rgba(255,255,255,.07);
+  box-shadow:0 0 14px var(--luz,#f2c230),inset 0 0 10px rgba(255,255,255,.18);
+  transition:opacity .35s,border-color .35s,box-shadow .35s;will-change:transform,width}
+.vgm-luz.on{opacity:1}
+body.vgm-claro .vgm-luz{background:rgba(255,255,255,.4)}
+
+/* ---------- Títulos y textos sobre el fondo ---------- */
+body.vgm .erp-main h1,body.vgm .erp-main h2,body.vgm .erp-main h3,body.vgm .erp-main h4{
+  font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:700;color:var(--txt)}
+body.vgm .erp-main h1{font-size:clamp(2rem,4.5vw,3rem);line-height:1.1;text-shadow:0 3px 0 rgba(0,0,0,.4)}
+body.vgm-claro .erp-main h1{text-shadow:0 2px 0 rgba(246,208,96,.85)}
+body.vgm .erp-main .text-muted,body.vgm .erp-main .small{color:var(--txt2) !important}
+body.vgm .erp-main a:not(.btn):not(.page-link):not(.list-group-item){color:var(--c)}
+body.vgm-claro .erp-main a:not(.btn):not(.page-link):not(.list-group-item){color:var(--link)}
+
+/* ---------- Tablas = cuadro de museo ---------- */
+body.vgm .erp-main table{
+  width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;color:var(--ink);background:var(--paper);
+  border:9px ridge #c99a1d;border-radius:4px;box-shadow:0 20px 32px rgba(0,0,0,.5),0 0 0 2px #4a3305;
+  --bs-table-bg:transparent;--bs-table-color:var(--ink);--bs-table-striped-bg:transparent;--bs-table-hover-bg:transparent}
+body.vgm .erp-main thead th{
+  background:linear-gradient(var(--deep),var(--a));color:var(--gold);font-weight:600;font-size:.9rem;letter-spacing:.04em;
+  padding:.95rem 1rem;border-bottom:3px solid var(--gold);box-shadow:none}
+body.vgm .erp-main tbody td,body.vgm .erp-main tbody th{
+  color:var(--ink);padding:.8rem 1rem;border-top:1px solid rgba(90,60,10,.18);box-shadow:none;vertical-align:middle}
+body.vgm .erp-main tbody tr:nth-child(odd)>*{background:var(--paper)}
+body.vgm .erp-main tbody tr:nth-child(even)>*{background:var(--paper2)}
+body.vgm .erp-main tbody tr{transition:filter .2s}
+body.vgm .erp-main tbody tr:hover>*{background:color-mix(in srgb,var(--c) 30%,var(--paper))}
+body.vgm .erp-main tbody a:not(.btn){color:var(--link);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+body.vgm .erp-main tbody a:not(.btn):hover{color:#000}
+body.vgm .erp-main tfoot td{background:var(--paper2);color:var(--ink);font-weight:700;border-top:3px double var(--gold-d)}
+@media (max-width:768px){body.vgm .erp-main table{display:block;overflow-x:auto}}
+
+/* ---------- Botones ---------- */
+body.vgm .btn{font-weight:600;border-radius:4px;transition:transform .2s,box-shadow .2s,filter .2s}
+body.vgm .btn:hover{transform:translateY(-2px)}
+body.vgm .btn-primary,body.vgm .btn-warning,body.vgm .btn-info{
+  background:linear-gradient(#f6dc7a,#e0a81c);border:2px solid #7a550a;color:#2b1d00}
+body.vgm .btn-primary:hover,body.vgm .btn-warning:hover,body.vgm .btn-info:hover{
+  background:linear-gradient(#f6dc7a,#e0a81c);color:#2b1d00;border-color:#7a550a;filter:brightness(1.07);box-shadow:0 0 14px rgba(242,194,48,.6)}
+body.vgm .btn-secondary,body.vgm .btn-light,body.vgm .btn-outline-primary,body.vgm .btn-outline-secondary,body.vgm .btn-outline-dark{
+  background:var(--paper);border:2px solid var(--gold-d);color:#4a3305}
+body.vgm .btn-secondary:hover,body.vgm .btn-light:hover,body.vgm .btn-outline-primary:hover,body.vgm .btn-outline-secondary:hover,body.vgm .btn-outline-dark:hover{
+  background:#fff4bf;border-color:var(--gold-d);color:#2b1d00;box-shadow:0 0 12px rgba(242,194,48,.5)}
+body.vgm .btn-danger,body.vgm .btn-outline-danger{background:#8f2a17;border:2px solid #4a1409;color:#fff}
+body.vgm .btn-danger:hover,body.vgm .btn-outline-danger:hover{background:#a8341f;border-color:#4a1409;color:#fff;box-shadow:0 0 12px rgba(200,70,40,.6)}
+body.vgm .btn-success,body.vgm .btn-outline-success{background:#1b5a36;border:2px solid #0b2a1c;color:#fff}
+body.vgm .btn-success:hover,body.vgm .btn-outline-success:hover{background:#246e43;border-color:#0b2a1c;color:#fff;box-shadow:0 0 12px rgba(80,170,100,.55)}
+body.vgm .btn:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+
+/* ---------- Etiquetas (stock, estados) ---------- */
+body.vgm .badge{font-weight:600;border-radius:999px;padding:.35em .75em}
+
+/* ---------- Formularios ---------- */
+body.vgm .erp-main label,body.vgm .erp-main .form-label{color:var(--txt);font-weight:600}
+body.vgm .erp-main .form-control,body.vgm .erp-main .form-select,body.vgm .erp-main textarea,
+body.vgm .erp-main select,
+body.vgm .erp-main input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=hidden]){
+  background-color:var(--paper);color:var(--ink);border:2px solid var(--gold-d);border-radius:4px}
+body.vgm .erp-main .form-control::placeholder,body.vgm .erp-main textarea::placeholder{color:#8a7647}
+body.vgm .erp-main .form-control:focus,body.vgm .erp-main .form-select:focus,body.vgm .erp-main textarea:focus,
+body.vgm .erp-main select:focus,body.vgm .erp-main input:focus{
+  background-color:#fffaf0;color:var(--ink);border-color:var(--b);box-shadow:0 0 0 .25rem rgba(242,194,48,.4);outline:none}
+body.vgm .erp-main .errorlist,body.vgm .erp-main .invalid-feedback{color:#ffb4a0;font-weight:600}
+body.vgm-claro .erp-main .errorlist,body.vgm-claro .erp-main .invalid-feedback{color:#8f2a17}
+body.vgm .erp-main .form-check-input:checked{background-color:var(--a);border-color:var(--gold)}
+
+/* ---------- Tarjetas, avisos, listas, paginación, modales ---------- */
+body.vgm .card,body.vgm .modal-content{
+  background:var(--paper);color:var(--ink);border:7px ridge #c99a1d;border-radius:4px;box-shadow:0 18px 30px rgba(0,0,0,.5)}
+body.vgm .card .text-muted,body.vgm .modal-content .text-muted{color:var(--ink2) !important}
+body.vgm .card label,body.vgm .modal-content label{color:var(--ink)}
+body.vgm .card h1,body.vgm .card h2,body.vgm .card h3,body.vgm .card h4,body.vgm .card h5,
+body.vgm .modal-content h5{color:var(--ink);text-shadow:none;font-family:"Palatino Linotype",Palatino,Georgia,serif}
+body.vgm .card a:not(.btn){color:var(--link)}
+body.vgm .card-header,body.vgm .modal-header{
+  background:linear-gradient(var(--deep),var(--a));color:var(--gold);border-bottom:3px solid var(--gold)}
+body.vgm .card-header h1,body.vgm .card-header h2,body.vgm .card-header h3,body.vgm .card-header h4,
+body.vgm .card-header h5,body.vgm .modal-header h5{color:var(--gold)}
+body.vgm .card-footer{background:var(--paper2);border-top:2px solid var(--gold-d)}
+
+body.vgm .alert{background:var(--paper);color:var(--ink);border:2px solid var(--gold-d);border-left-width:9px;border-radius:4px}
+body.vgm .alert-success{border-left-color:#3f8f4a}
+body.vgm .alert-danger,body.vgm .alert-error{border-left-color:#c4592a}
+body.vgm .alert-warning{border-left-color:var(--gold)}
+body.vgm .alert-info{border-left-color:var(--b)}
+
+body.vgm .list-group-item{background:var(--paper);color:var(--ink);border-color:rgba(90,60,10,.25)}
+body.vgm .list-group-item.active{background:var(--a);color:var(--gold);border-color:var(--gold)}
+
+body.vgm .page-link{background:var(--paper);color:var(--link);border:1px solid var(--gold-d)}
+body.vgm .page-link:hover{background:#fff4bf;color:#000}
+body.vgm .page-item.active .page-link{background:var(--a);color:var(--gold);border-color:var(--gold)}
+body.vgm .page-item.disabled .page-link{background:var(--paper2);color:var(--ink2)}
+
+body.vgm .breadcrumb-item,body.vgm .breadcrumb-item a{color:var(--txt2)}
+body.vgm .breadcrumb-item.active{color:var(--txt)}
+
+body.vgm hr{border-color:var(--c);opacity:.6}
+
+@media (prefers-reduced-motion:reduce){
+  body.vgm .btn:hover{transform:none}
+  .vgm-luz{transition:none}
+}
+
+/* ===== ANIMACIONES ===== */
+
+/* Fondo vivo */
+@property --vgm-gx{syntax:"<percentage>";inherits:false;initial-value:30%}
+@property --vgm-gy{syntax:"<percentage>";inherits:false;initial-value:0%}
+
+body.vgm{
+  background:radial-gradient(ellipse at var(--vgm-gx) var(--vgm-gy),var(--bg1) 0,var(--bg2) 42%,var(--bg3) 100%) fixed;
+  animation:vgmRespira 22s ease-in-out infinite alternate;
+}
+@keyframes vgmRespira{
+  0%{--vgm-gx:18%;--vgm-gy:-6%}
+  100%{--vgm-gx:78%;--vgm-gy:14%}
+}
+
+/* Espirales: giran despacio y se mueven con el scroll */
+body.vgm::before{
+  transform-origin:50% 50%;
+  animation:vgmDeriva 40s ease-in-out infinite alternate;
+  translate:0 calc(var(--vgm-par,0) * -.12px);
+  will-change:transform,translate;
+}
+@keyframes vgmDeriva{
+  0%{transform:rotate(-3deg) scale(1)}
+  100%{transform:rotate(5deg) scale(1.08)}
+}
+
+/* Estrellas (las dibuja el JS) */
+.vgm-estrellas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* Entrada tipo notificación */
+.vgm-pre{opacity:0}
+.vgm-in{
+  animation:vgmNotif .75s cubic-bezier(.22,1.15,.36,1) backwards;
+  animation-delay:var(--vgm-d,0ms);
+}
+@keyframes vgmNotif{
+  0%{opacity:0;transform:translate(46px,-16px) scale(.95)}
+  60%{opacity:1;transform:translate(-5px,2px) scale(1.012)}
+  100%{opacity:1;transform:none}
+}
+body.vgm .erp-main tbody tr.vgm-in>*{animation:vgmDestelloFila 1.3s ease-out backwards;animation-delay:var(--vgm-d,0ms)}
+@keyframes vgmDestelloFila{
+  0%{box-shadow:inset 0 0 0 999px rgba(242,194,48,.55)}
+  100%{box-shadow:inset 0 0 0 999px rgba(242,194,48,0)}
+}
+body.vgm .card.vgm-in,body.vgm .list-group-item.vgm-in,body.vgm .alert.vgm-in{
+  animation:vgmNotif .75s cubic-bezier(.22,1.15,.36,1) backwards,vgmDestelloCaja 1.4s ease-out backwards;
+  animation-delay:var(--vgm-d,0ms),var(--vgm-d,0ms);
+}
+@keyframes vgmDestelloCaja{
+  0%{box-shadow:0 0 0 0 rgba(242,194,48,.9),0 0 26px 6px rgba(242,194,48,.7)}
+  100%{box-shadow:0 0 0 14px rgba(242,194,48,0),0 18px 30px rgba(0,0,0,.5)}
+}
+
+/* Opción elegida al centro, las demás un poco más abajo */
+body.vgm .vgm-item{
+  cursor:pointer;
+  transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .35s,filter .35s,box-shadow .35s;
+}
+body.vgm .vgm-item.vgm-baja{transform:translateY(8px) scale(.99);opacity:.74;filter:saturate(.75)}
+body.vgm .vgm-item.vgm-sel{transform:scale(1.02);opacity:1;filter:none;position:relative;z-index:5}
+body.vgm .card.vgm-sel,body.vgm .list-group-item.vgm-sel{
+  box-shadow:0 0 0 3px var(--gold),0 0 30px rgba(242,194,48,.65),0 24px 36px rgba(0,0,0,.55)}
+body.vgm .erp-main tbody tr.vgm-sel>*{
+  background:color-mix(in srgb,var(--c) 45%,var(--paper));
+  box-shadow:inset 0 3px 0 var(--gold),inset 0 -3px 0 var(--gold);
+  font-weight:600}
+
+/* Barra: módulo activo arriba, los demás un poco más abajo */
+body.vgm .erp-nav-link{position:relative;top:3px;transition:top .35s cubic-bezier(.22,1,.36,1),color .2s}
+body.vgm .erp-nav-link:hover,body.vgm .erp-nav-link:focus-visible,body.vgm .erp-nav-link.active{top:0;transition:color .2s}
