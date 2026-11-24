@@ -141,7 +141,12 @@ class Pedido(models.Model):
         auto_now_add=True,
         verbose_name='Fecha del pedido',
     )
-
+    fecha_pago = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Fecha de confirmación del pago',
+        help_text='Fecha y hora en que se confirmó el pago mediante Stripe.',
+    )
     fecha_entrega = models.DateField(
         null=True,
         blank=True,
@@ -203,3 +208,60 @@ class Pedido(models.Model):
                     'a la fecha del pedido.'
                 ),
             })
+
+class ReporteDiario(models.Model):
+    """Controla el envío del reporte diario para evitar duplicados."""
+
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('procesando', 'Procesando'),
+        ('enviado', 'Enviado'),
+        ('error', 'Error'),
+    ]
+
+    fecha_reporte = models.DateField(
+        unique=True,
+        verbose_name='Fecha del reporte',
+        help_text='Solo puede existir un registro por día.',
+    )
+
+    estado = models.CharField(
+        max_length=15,
+        choices=ESTADO_CHOICES,
+        default='pendiente',
+        verbose_name='Estado del reporte',
+    )
+
+    enviado_en = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Fecha de envío',
+    )
+
+    intentos = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='Intentos de envío',
+    )
+
+    detalle_error = models.TextField(
+        blank=True,
+        verbose_name='Detalle del error',
+    )
+
+    creado = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de creación',
+    )
+
+    actualizado = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Última actualización',
+    )
+
+    class Meta:
+        verbose_name = 'Reporte diario'
+        verbose_name_plural = 'Reportes diarios'
+        ordering = ['-fecha_reporte']
+
+    def __str__(self):
+        return f'Reporte {self.fecha_reporte} — {self.get_estado_display()}'

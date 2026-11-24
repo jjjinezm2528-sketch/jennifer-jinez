@@ -2,149 +2,281 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de ventas — {{ fecha }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 14px;
             background: #F5F7FA;
             color: #1A1A2E;
+            padding: 20px;
         }
+
         .wrapper {
-            max-width: 640px;
+            max-width: 720px;
             margin: 24px auto;
             background: #FFFFFF;
             border-radius: 12px;
             overflow: hidden;
         }
+
         .header {
             background: #0A2342;
             padding: 26px 32px;
-            border-bottom: 4px solid #B8860B;
+            border-bottom: 4px solid #D4AF37;
         }
+
         .header-title {
             color: #D4AF37;
-            font-size: 20px;
+            font-size: 21px;
             font-weight: bold;
         }
+
         .header-sub {
-            color: rgba(255,255,255,.72);
+            color: #FFFFFF;
+            opacity: .85;
             font-size: 13px;
-            margin-top: 4px;
+            margin-top: 8px;
         }
+
         .body { padding: 26px 32px; }
-        /* KPI cards */
-        .kpi-grid {
-            display: table;
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 8px;
-            margin-bottom: 24px;
+
+        .section-title {
+            font-weight: bold;
+            color: #0A2342;
+            margin: 26px 0 10px;
+            font-size: 16px;
         }
-        .kpi-row { display: table-row; }
+
+        .section-subtitle {
+            color: #5A6A7E;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-grid {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
         .kpi-card {
-            display: table-cell;
             background: #E8F0FB;
             border-radius: 8px;
-            padding: 14px 16px;
+            padding: 14px;
             text-align: center;
             width: 50%;
         }
+
         .kpi-valor {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: bold;
             color: #0A2342;
         }
+
+        .gold .kpi-valor { color: #B8860B; }
+
         .kpi-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #5A6A7E;
             text-transform: uppercase;
-            letter-spacing: .05em;
-            margin-top: 3px;
+            margin-top: 5px;
         }
-        .kpi-card.gold .kpi-valor { color: #B8860B; }
-        /* Tabla top productos */
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 16px 0;
+            margin: 12px 0 20px;
         }
+
         th {
             background: #0A2342;
             color: #FFFFFF;
-            padding: 10px 14px;
+            padding: 10px 8px;
             font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .05em;
             text-align: left;
         }
-        th.num { text-align: right; }
+
         td {
-            padding: 9px 14px;
+            padding: 10px 8px;
             border-bottom: 1px solid #E8F0FB;
-            font-size: 13px;
+            font-size: 12px;
+            vertical-align: top;
         }
-        td.num { text-align: right; }
-        .sin-ventas {
-            background: #FDF8E8;
-            border: 1px solid #B8860B;
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
+
+        .num { text-align: right; white-space: nowrap; }
+
+        .muted {
             color: #5A6A7E;
-            font-size: 14px;
-            margin: 16px 0;
+            font-size: 11px;
         }
+
+        .sin-datos {
+            background: #FDF8E8;
+            border: 1px solid #D4AF37;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+            margin: 12px 0;
+            color: #5A6A7E;
+        }
+
+        .stock-alert {
+            background: #FFF4E5;
+            border-left: 4px solid #D98B19;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .admin-link {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #5A6A7E;
+            word-break: break-word;
+        }
+
+        .admin-link a { color: #0A2342; }
+
         .footer {
             background: #F5F7FA;
             border-top: 1px solid #C8D8EC;
-            padding: 14px 32px;
+            padding: 16px 32px;
             font-size: 11px;
             color: #5A6A7E;
             text-align: center;
+            line-height: 1.7;
         }
     </style>
 </head>
+
 <body>
 <div class="wrapper">
 
-    <!-- ENCABEZADO -->
     <div class="header">
-        <div class="header-title">📊 Reporte de ventas del día</div>
+        <div class="header-title">📊 Reporte diario de ventas</div>
         <div class="header-sub">
             {{ config.nombre_empresa }} · {{ fecha }}
         </div>
     </div>
 
-    <!-- CUERPO -->
     <div class="body">
 
-        <!-- KPIs -->
-        <div class="kpi-grid">
-            <div class="kpi-row">
-                <div class="kpi-card">
-                    <div class="kpi-valor">{{ total_pedidos }}</div>
-                    <div class="kpi-label">Pedidos pagados hoy</div>
-                </div>
-                <div class="kpi-card gold">
-                    <div class="kpi-valor">${{ total_facturado }}</div>
-                    <div class="kpi-label">Total facturado</div>
-                </div>
-            </div>
-        </div>
+        <p class="section-title">Resumen general</p>
+
+        <table class="kpi-grid">
+            <tr>
+                <td class="kpi-card">
+                    <div class="kpi-valor">{{ total_operaciones }}</div>
+                    <div class="kpi-label">Operaciones totales</div>
+                </td>
+                <td class="kpi-card gold">
+                    <div class="kpi-valor">${{ total_facturado|floatformat:2 }}</div>
+                    <div class="kpi-label">Ingresos totales</div>
+                </td>
+            </tr>
+        </table>
+
+        <p class="section-title">1. Pedidos en línea</p>
+        <p class="section-subtitle">
+            Pedidos pagados mediante el checkout.
+        </p>
+
+        <p>
+            <strong>Pedidos:</strong> {{ total_pedidos }}<br>
+            <strong>Importe:</strong> ${{ importe_pedidos|floatformat:2 }}
+        </p>
+
+        {% if pedidos_detalle %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Pedido / Cliente</th>
+                    <th>Productos</th>
+                    <th>Hora</th>
+                    <th class="num">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos_detalle %}
+                <tr>
+                    <td>
+                        <strong>{{ pedido.numero }}</strong><br>
+                        <span class="muted">{{ pedido.cliente }}</span>
+                    </td>
+                    <td>
+                        {% for item in pedido.items %}
+                            {{ item.nombre }} × {{ item.cantidad }}<br>
+                        {% empty %}
+                            <span class="muted">Sin artículos registrados</span>
+                        {% endfor %}
+                    </td>
+                    <td>{{ pedido.fecha }}</td>
+                    <td class="num">${{ pedido.total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="sin-datos">No hubo pedidos en línea pagados durante este día.</div>
+        {% endif %}
+
+        <p class="section-title">2. Ventas internas</p>
+        <p class="section-subtitle">
+            Operaciones registradas en el módulo de ventas.
+        </p>
+
+        <p>
+            <strong>Ventas:</strong> {{ total_ventas }}<br>
+            <strong>Importe:</strong> ${{ importe_ventas|floatformat:2 }}
+        </p>
+
+        {% if ventas_detalle %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Venta / Cliente</th>
+                    <th>Productos</th>
+                    <th>Hora</th>
+                    <th class="num">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas_detalle %}
+                <tr>
+                    <td>
+                        <strong>Venta #{{ venta.numero }}</strong><br>
+                        <span class="muted">{{ venta.cliente }}</span>
+                    </td>
+                    <td>
+                        {% for item in venta.items %}
+                            {{ item.nombre }} × {{ item.cantidad }}<br>
+                        {% empty %}
+                            <span class="muted">Sin artículos registrados</span>
+                        {% endfor %}
+                    </td>
+                    <td>{{ venta.fecha }}</td>
+                    <td class="num">${{ venta.total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="sin-datos">No hubo ventas internas registradas durante este día.</div>
+        {% endif %}
+
+        <p class="section-title">3. Productos más vendidos</p>
 
         {% if top_productos %}
-        <p style="font-weight:600;color:#0A2342;margin-bottom:8px;">
-            Top {{ top_productos|length }} productos del día
-        </p>
         <table>
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Producto</th>
-                    <th class="num">Unidades vendidas</th>
-                    <th class="num">Ingreso ($)</th>
+                    <th class="num">Unidades</th>
+                    <th class="num">Ingreso</th>
                 </tr>
             </thead>
             <tbody>
@@ -153,27 +285,130 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ prod.nombre }}</td>
                     <td class="num">{{ prod.unidades }}</td>
-                    <td class="num">${{ prod.ingreso }}</td>
+                    <td class="num">${{ prod.ingreso|floatformat:2 }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="sin-ventas">
-            Sin ventas registradas hoy. ¡Hay oportunidad de mejorar! 🎯
+        <div class="sin-datos">No hay productos vendidos en el período.</div>
+        {% endif %}
+
+        <p class="section-title">4. Productos que necesitan reabasto</p>
+        <p class="section-subtitle">
+            Productos activos con existencias inferiores a {{ umbral_stock }} unidades.
+        </p>
+
+        {% if productos_bajos %}
+        <div class="stock-alert">
+            Se encontraron {{ total_productos_bajos }} producto(s) que requieren revisión de inventario.
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="num">Existencias</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod in productos_bajos %}
+                <tr>
+                    <td>{{ prod.nombre }}</td>
+                    <td>{{ prod.categoria__nombre|default:"Sin categoría" }}</td>
+                    <td class="num">{{ prod.stock }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="sin-datos">
+            No hay productos activos con menos de {{ umbral_stock }} unidades.
         </div>
         {% endif %}
 
-        <p style="color:#5A6A7E;font-size:12px;margin-top:12px;">
-            Panel de administración:
-            <a href="{{ url_admin }}" style="color:#0A2342;">
-                {{ url_admin }}
-            </a>
+        <p class="section-title">5. Inventario completo</p>
+        <p class="section-subtitle">
+            Existencias actuales de todos los productos registrados, activos e inactivos.
         </p>
+
+        <table class="kpi-grid">
+            <tr>
+                <td class="kpi-card">
+                    <div class="kpi-valor">{{ total_productos_inventario }}</div>
+                    <div class="kpi-label">Productos registrados</div>
+                </td>
+                <td class="kpi-card gold">
+                    <div class="kpi-valor">{{ total_unidades_inventario }}</div>
+                    <div class="kpi-label">Unidades existentes</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="kpi-card">
+                    <div class="kpi-valor">{{ total_activos }}</div>
+                    <div class="kpi-label">Productos activos</div>
+                </td>
+                <td class="kpi-card">
+                    <div class="kpi-valor">{{ total_inactivos }}</div>
+                    <div class="kpi-label">Productos inactivos</div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="stock-alert">
+            <strong>Valor total del inventario:</strong>
+            ${{ valor_total_inventario|floatformat:2 }}
+        </div>
+
+        {% if inventario %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="num">Precio</th>
+                    <th class="num">Stock</th>
+                    <th class="num">Valor</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod in inventario %}
+                <tr>
+                    <td>{{ prod.nombre }}</td>
+                    <td>{{ prod.categoria__nombre|default:"Sin categoría" }}</td>
+                    <td class="num">${{ prod.precio|floatformat:2 }}</td>
+                    <td class="num">{{ prod.stock }}</td>
+                    <td class="num">${{ prod.valor_inventario|floatformat:2 }}</td>
+                    <td>{{ prod.estado }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="sin-datos">
+            No hay productos registrados en el inventario.
+        </div>
+        {% endif %}
+
+        <p>
+            <strong>Total de ingresos del día:</strong>
+            ${{ total_facturado|floatformat:2 }}
+        </p>
+
+        <div class="admin-link">
+            Panel de administración:
+            <a href="{{ url_admin }}">Consultar pedidos</a>
+        </div>
+
     </div>
 
     <div class="footer">
-        <p>Generado automáticamente por ERP Django a las 8:00 AM</p>
+        <p>
+            Reporte generado automáticamente por ERP Django a las
+            {{ hora_generacion }} (hora de México).
+        </p>
         <p>{{ config.nombre_empresa }}</p>
     </div>
 

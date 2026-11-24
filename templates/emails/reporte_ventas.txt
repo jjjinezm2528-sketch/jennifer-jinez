@@ -1,23 +1,117 @@
-📊 REPORTE DE VENTAS DEL DÍA — {{ fecha }}
+
+REPORTE DIARIO DE VENTAS — {{ fecha }}
 {{ config.nombre_empresa }}
-═══════════════════════════════════════════
 
-RESUMEN:
-  Pedidos pagados hoy: {{ total_pedidos }}
-  Total facturado:     ${{ total_facturado }}
+==================================================
 
-{% if top_productos %}
-TOP PRODUCTOS:
-{% for prod in top_productos %}
-  {{ forloop.counter }}. {{ prod.nombre }}
-     Unidades: {{ prod.unidades }} | Ingreso: ${{ prod.ingreso }}
+RESUMEN GENERAL
+
+Operaciones totales: {{ total_operaciones }}
+Ingresos totales: ${{ total_facturado|floatformat:2 }}
+
+==================================================
+1. PEDIDOS EN LÍNEA
+==================================================
+
+Cantidad de pedidos: {{ total_pedidos }}
+Importe de pedidos: ${{ importe_pedidos|floatformat:2 }}
+
+{% for pedido in pedidos_detalle %}
+Pedido: {{ pedido.numero }}
+Cliente: {{ pedido.cliente }}
+Hora: {{ pedido.fecha }}
+Productos:
+{% for item in pedido.items %}
+  - {{ item.nombre }} x {{ item.cantidad }}
 {% endfor %}
-{% else %}
-Sin ventas registradas hoy.
-{% endif %}
+Total: ${{ pedido.total|floatformat:2 }}
 
-Panel de administración: {{ url_admin }}
+{% empty %}
+No hubo pedidos en línea pagados durante este día.
+{% endfor %}
 
-───────────────────────────────────────────
-Generado automáticamente a las 8:00 AM
-ERP Django · {{ config.nombre_empresa }}
+==================================================
+2. VENTAS INTERNAS
+==================================================
+
+Cantidad de ventas: {{ total_ventas }}
+Importe de ventas: ${{ importe_ventas|floatformat:2 }}
+
+{% for venta in ventas_detalle %}
+Venta: #{{ venta.numero }}
+Cliente: {{ venta.cliente }}
+Hora: {{ venta.fecha }}
+Productos:
+{% for item in venta.items %}
+  - {{ item.nombre }} x {{ item.cantidad }}
+{% endfor %}
+Total: ${{ venta.total|floatformat:2 }}
+
+{% empty %}
+No hubo ventas internas durante este día.
+{% endfor %}
+
+==================================================
+3. PRODUCTOS MÁS VENDIDOS
+==================================================
+
+{% for prod in top_productos %}
+{{ forloop.counter }}. {{ prod.nombre }}
+   Unidades: {{ prod.unidades }}
+   Ingreso: ${{ prod.ingreso|floatformat:2 }}
+
+{% empty %}
+No hay productos vendidos durante este día.
+{% endfor %}
+
+==================================================
+4. PRODUCTOS QUE NECESITAN REABASTO
+==================================================
+
+Umbral de alerta: menos de {{ umbral_stock }} unidades.
+Productos encontrados: {{ total_productos_bajos }}
+
+{% for prod in productos_bajos %}
+- {{ prod.nombre }}
+  Existencias: {{ prod.stock }}
+  Categoría: {{ prod.categoria__nombre|default:"Sin categoría" }}
+
+{% empty %}
+No hay productos activos con menos de {{ umbral_stock }} unidades.
+{% endfor %}
+
+==================================================
+5. INVENTARIO COMPLETO
+==================================================
+
+RESUMEN DEL INVENTARIO
+
+Productos registrados: {{ total_productos_inventario }}
+Productos activos: {{ total_activos }}
+Productos inactivos: {{ total_inactivos }}
+Unidades existentes: {{ total_unidades_inventario }}
+Valor total del inventario: ${{ valor_total_inventario|floatformat:2 }}
+
+DETALLE DE PRODUCTOS
+
+{% for prod in inventario %}
+Producto: {{ prod.nombre }}
+Categoría: {{ prod.categoria__nombre|default:"Sin categoría" }}
+Precio unitario: ${{ prod.precio|floatformat:2 }}
+Existencias: {{ prod.stock }}
+Valor en inventario: ${{ prod.valor_inventario|floatformat:2 }}
+Estado: {{ prod.estado }}
+
+{% empty %}
+No hay productos registrados en el inventario.
+{% endfor %}
+
+==================================================
+
+TOTAL DE INGRESOS: ${{ total_facturado|floatformat:2 }}
+
+Panel de administración:
+{{ url_admin }}
+
+Reporte generado automáticamente por ERP Django a las {{ hora_generacion }} (hora de México).
+{{ config.nombre_empresa }}

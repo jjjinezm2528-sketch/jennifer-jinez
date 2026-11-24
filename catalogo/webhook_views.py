@@ -30,6 +30,7 @@ from django.views.decorators.http import require_POST
 
 from productos.models import Producto
 from ventas.models import Pedido
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -110,10 +111,13 @@ def _manejar_pago_exitoso(payment_intent: dict) -> None:
 
             if pedido.estado != 'pagado':
 
-                # Confirmar el pedido.
+                # Confirmar el pedido y registrar la fecha real del pago.
                 pedido.estado = 'pagado'
-                pedido.save(update_fields=['estado'])
+                pedido.fecha_pago = timezone.now()
 
+                pedido.save(
+                    update_fields=['estado', 'fecha_pago']
+                )
                 logger.info(
                     'Pedido %s actualizado a pagado.',
                     pedido.numero_pedido

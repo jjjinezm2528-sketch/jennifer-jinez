@@ -576,6 +576,10 @@ ADMINS = [
         env("ADMIN_EMAIL", default="admin@erp-django.com"),
     ),
 ]
+# Destinatarios de las alertas de inventario.
+ALERTA_STOCK_DESTINATARIOS = [
+    env("ADMIN_EMAIL", default="admin@erp-django.com"),
+]
 
 # Clave de SendGrid.
 SENDGRID_API_KEY = env(
